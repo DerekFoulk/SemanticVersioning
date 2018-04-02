@@ -17,9 +17,11 @@
             this.InitializeComponent();
 
             DataContext = this;
+
+            Version = VersionManager.GetCurrentVersion();
         }
 
-        public Version Version { get; set; } = new Version();
+        public Version Version { get; set; }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {

@@ -62,6 +62,7 @@
       <DependentUpon>VersioningWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="VersioningWindowPackage.cs" />
+    <Compile Include="VersionManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using EnvDTE;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -63,6 +64,8 @@ namespace SemanticVersioning
         {
             VersioningWindowCommand.Initialize(this);
             base.Initialize();
+
+            VersionManager.DTE = (DTE)GetGlobalService(typeof(DTE));
         }
 
         #endregion
