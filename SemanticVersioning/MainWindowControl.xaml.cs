@@ -15,20 +15,17 @@
         public MainWindowControl()
         {
             this.InitializeComponent();
+
+            DataContext = this;
+
+            Version = SemanticVersioningManager.Instance.CurrentVersion;
         }
 
-        /// <summary>
-        /// Handles click on the button by displaying a message box.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="e">The event args.</param>
-        [SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions", Justification = "Sample code")]
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Default event handler naming pattern")]
-        private void button1_Click(object sender, RoutedEventArgs e)
+        public Version Version { get; set; }
+
+        private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(
-                string.Format(System.Globalization.CultureInfo.CurrentUICulture, "Invoked '{0}'", this.ToString()),
-                "MainWindow");
+            MessageBox.Show($"Updated version to {Version.ToString()}", "Version Updated");
         }
     }
 }
