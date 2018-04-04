@@ -97,13 +97,9 @@ namespace SemanticVersioning
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
 
-            WindowOpened(EventArgs.Empty);
+            WindowOpened?.Invoke(this, EventArgs.Empty);
         }
 
-        public event EventHandler OnWindowOpened;
-        private void WindowOpened(EventArgs e)
-        {
-            OnWindowOpened?.Invoke(this, e);
-        }
+        public event EventHandler WindowOpened;
     }
 }

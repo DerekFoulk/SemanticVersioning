@@ -15,7 +15,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="MainWindowControl"/> class.
         /// </summary>
-        public MainWindowControl()
+        public MainWindowControl(MainWindow mainWindow)
         {
             this.InitializeComponent();
 
@@ -23,7 +23,8 @@
 
             Version = SemanticVersioningManager.Instance.CurrentVersion;
 
-            MainWindowCommand.Instance.OnWindowOpened += Refresh;
+            MainWindowCommand.Instance.WindowOpened += Refresh;
+            mainWindow.DocumentSaved += Refresh;
         }
 
         public Version Version { get; set; }
