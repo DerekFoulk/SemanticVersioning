@@ -3,6 +3,7 @@
     using PropertyChanged;
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Text;
     using System.Windows;
     using System.Windows.Controls;
 
@@ -36,7 +37,15 @@
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show($"Updated version to {Version.ToString()}", "Version Updated");
+            SemanticVersioningManager.Instance.SetVersion(Version);
+
+            var sb = new StringBuilder();
+            sb.AppendLine("Updated version to:");
+            sb.AppendLine(Version.ToString());
+            sb.AppendLine(Version.ToSemanticVersionString());
+            sb.AppendLine(Version.ToAssemblyVersionString());
+
+            MessageBox.Show(sb.ToString(), "Version Updated");
         }
     }
 }

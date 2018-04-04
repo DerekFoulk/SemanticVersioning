@@ -1,7 +1,9 @@
-﻿using System.Text.RegularExpressions;
+﻿using PropertyChanged;
+using System.Text.RegularExpressions;
 
 namespace SemanticVersioning
 {
+    [AddINotifyPropertyChangedInterface]
     public class Version
     {
         public Version()
@@ -64,6 +66,24 @@ namespace SemanticVersioning
 
             if (Build != null)
                 version += $".{Build}";
+
+            return version;
+        }
+
+        public string ToSemanticVersionString()
+        {
+            string version = null;
+
+            version = $"{Major?.ToString() ?? "0"}.{Minor?.ToString() ?? "0"}.{Patch?.ToString() ?? "0"}";
+
+            return version;
+        }
+
+        public string ToAssemblyVersionString()
+        {
+            string version = null;
+
+            version = $"{Major?.ToString() ?? "0"}.{Minor?.ToString() ?? "0"}.{Patch?.ToString() ?? "0"}.{Build?.ToString() ?? "0"}";
 
             return version;
         }

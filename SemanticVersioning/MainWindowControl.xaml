@@ -44,22 +44,22 @@
                    Margin="5" />
 
         <TextBox Name="MajorTextBox"
-                 Text="{Binding Version.Major}"
+                 Text="{Binding Version.Major, TargetNullValue='', Mode=TwoWay}"
                  Grid.Row="1"
                  Grid.Column="0"
                  Margin="5" />
         <TextBox Name="MinorTextBox"
-                 Text="{Binding Version.Minor}"
+                 Text="{Binding Version.Minor, TargetNullValue='', Mode=TwoWay}"
                  Grid.Row="1"
                  Grid.Column="1"
                  Margin="5" />
         <TextBox Name="PatchTextBox"
-                 Text="{Binding Version.Patch}"
+                 Text="{Binding Version.Patch, TargetNullValue='', Mode=TwoWay}"
                  Grid.Row="1"
                  Grid.Column="2"
                  Margin="5" />
         <TextBox Name="BuildTextBox"
-                 Text="{Binding Version.Build}"
+                 Text="{Binding Version.Build, TargetNullValue='', Mode=TwoWay}"
                  Grid.Row="1"
                  Grid.Column="3"
                  Margin="5" />
