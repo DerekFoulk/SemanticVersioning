@@ -21,11 +21,16 @@ namespace SemanticVersioning
 
         public Version CurrentVersion => GetVersion();
 
+        public static void Initialize(DTE dte)
+        {
+            Instance = new SemanticVersioningManager(dte);
+        }
+
         private Version GetVersion()
         {
             var projects = _dte.Solution?.Projects;
 
-            if (projects == null)
+            if (projects == default(Projects))
                 return null;
 
             var versions = new List<string>();
@@ -35,6 +40,10 @@ namespace SemanticVersioning
                 try
                 {
                     var project = (Project)item;
+
+                    if (string.IsNullOrWhiteSpace(project.FileName))
+                        continue;
+
                     var version = project.Properties.Item("Version").Value.ToString();
 
                     versions.Add(version);
@@ -49,54 +58,63 @@ namespace SemanticVersioning
             return new Version(highestVersion);
         }
 
-        public static void Initialize(DTE dte)
-        {
-            Instance = new SemanticVersioningManager(dte);
-        }
-
         // Set Project Properties
         public void SetVersion(Version version)
         {
             var projects = _dte.Solution?.Projects;
 
-            if (projects == null)
+            if (projects == default(Projects))
                 return;
 
-            foreach (var p in projects)
+            foreach (var item in projects)
             {
-                var project = (Project)p;
-
-                if (string.IsNullOrWhiteSpace(project.FileName))
-                    continue;
-
-                // .NET Standard Projects
                 try
                 {
-                    var xmlDoc = new XmlDocument();
-                    xmlDoc.Load(project.FileName);
+                    var project = (Project)item;
 
-                    var xmlNode = xmlDoc.SelectSingleNode("Project/PropertyGroup/Version");
-                    xmlNode.InnerText = version.ToString();
+                    if (string.IsNullOrWhiteSpace(project.FileName))
+                        continue;
 
-                    xmlDoc.Save(project.FileName);
+                    // Project File
+                    SetProjectVersion(project, version);
+
+                    // AssemblyInfo Files
+                    SetAssemblyInfoVersion(project, version);
                 }
                 catch
                 {
                 }
+            }
+        }
 
-                // AssemblyInfo Files
+        private void SetProjectVersion(Project project, Version version)
+        {
+            var xmlDoc = new XmlDocument();
+            xmlDoc.Load(project.FileName);
+
+            var xmlNode = xmlDoc.SelectSingleNode("Project/PropertyGroup/Version");
+            xmlNode.InnerText = version.ToString();
+
+            xmlDoc.Save(project.FileName);
+        }
+
+        private void SetAssemblyInfoVersion(Project project, Version version)
+        {
+            var projectDirectory = Path.GetDirectoryName(project.FileName);
+            var projectFiles = Directory.GetFiles(projectDirectory, "*", SearchOption.AllDirectories);
+            var assemblyInfoFiles = projectFiles?.Where(x => !x.Contains("bin") && !x.Contains("obj")).Where(x => x.EndsWith("AssemblyInfo.cs"));
+
+            if (assemblyInfoFiles == default(IEnumerable<string>))
+                return;
+
+            foreach (var assemblyInfoFile in assemblyInfoFiles)
+            {
                 try
                 {
-                    var projectDirectory = Path.GetDirectoryName(project.FileName);
-                    var projectFiles = Directory.GetFiles(projectDirectory, "*", SearchOption.AllDirectories);
-                    var assemblyInfoFiles = projectFiles.Where(x => !x.Contains("bin") && !x.Contains("obj")).Where(x => x.EndsWith("AssemblyInfo.cs"));
+                    File.Move(assemblyInfoFile, $"{assemblyInfoFile}.bak");
 
-                    foreach (var assemblyInfoFile in assemblyInfoFiles)
+                    try
                     {
-                        // Rename source file as .bak
-                        File.Move(assemblyInfoFile, $"{assemblyInfoFile}.bak");
-
-                        // Create new file with updates in its place
                         var lines = File.ReadLines($"{assemblyInfoFile}.bak");
 
                         using (var file = new StreamWriter(assemblyInfoFile))
@@ -127,8 +145,19 @@ namespace SemanticVersioning
 
                             file.Close();
                         }
+                    }
+                    catch
+                    {
+                        if (File.Exists(assemblyInfoFile))
+                            File.Delete(assemblyInfoFile);
 
-                        File.Delete($"{assemblyInfoFile}.bak");
+                        if (File.Exists($"{assemblyInfoFile}.bak"))
+                            File.Move($"{assemblyInfoFile}.bak", assemblyInfoFile);
+                    }
+                    finally
+                    {
+                        if (File.Exists($"{assemblyInfoFile}.bak"))
+                            File.Delete($"{assemblyInfoFile}.bak");
                     }
                 }
                 catch
