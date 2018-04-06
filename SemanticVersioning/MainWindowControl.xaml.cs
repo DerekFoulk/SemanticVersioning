@@ -38,14 +38,6 @@
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
             SemanticVersioningManager.Instance.SetVersion(Version);
-
-            var sb = new StringBuilder();
-            sb.AppendLine("Updated version to:");
-            sb.AppendLine(Version.ToString());
-            sb.AppendLine(Version.ToSemanticVersionString());
-            sb.AppendLine(Version.ToAssemblyVersionString());
-
-            MessageBox.Show(sb.ToString(), "Version Updated");
         }
     }
 }

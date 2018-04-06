@@ -33,32 +33,51 @@ namespace SemanticVersioning
             if (projects == default(Projects))
                 return null;
 
-            var versions = new List<string>();
+            var versions = new List<Version>();
 
-            foreach (var item in projects)
+            foreach (Project project in projects)
             {
+                if (string.IsNullOrWhiteSpace(project.FileName))
+                    continue;
+
                 try
                 {
-                    var project = (Project)item;
-
-                    if (string.IsNullOrWhiteSpace(project.FileName))
-                        continue;
-
-                    var version = project.Properties.Item("Version").Value.ToString();
-
-                    versions.Add(version);
+                    var projectVersion = project.Properties.Item("Version").Value.ToString();
+                    versions.Add(new Version(projectVersion));
                 }
                 catch
                 {
                 }
+
+                var assemblyInfoFiles = GetAssemblyInfoFiles(project);
+
+                if (assemblyInfoFiles == default(IEnumerable<string>) || !assemblyInfoFiles.Any())
+                    continue;
+
+                foreach (var assemblyInfoFile in assemblyInfoFiles)
+                {
+                    try
+                    {
+                        var file = File.ReadAllText(assemblyInfoFile);
+                        var matches = Regex.Matches(file, "Assembly(File)*Version\\(\"(\\d+|\\d+(\\.\\d+)+)\\.*\\**\"\\)");
+
+                        foreach (Match match in matches)
+                        {
+                            var versionInMatch = Regex.Match(match.Value, @"\d+(\.\d+)*").Value;
+                            versions.Add(new Version(versionInMatch));
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
             }
 
-            var highestVersion = versions.Distinct().OrderByDescending(x => x).FirstOrDefault();
+            var highestVersion = versions.OrderByDescending(x => x.ToAssemblyVersionString()).FirstOrDefault();
 
-            return new Version(highestVersion);
+            return highestVersion;
         }
 
-        // Set Project Properties
         public void SetVersion(Version version)
         {
             var projects = _dte.Solution?.Projects;
@@ -66,19 +85,21 @@ namespace SemanticVersioning
             if (projects == default(Projects))
                 return;
 
-            foreach (var item in projects)
+            foreach (Project project in projects)
             {
+                if (string.IsNullOrWhiteSpace(project.FileName))
+                    continue;
+
                 try
                 {
-                    var project = (Project)item;
-
-                    if (string.IsNullOrWhiteSpace(project.FileName))
-                        continue;
-
-                    // Project File
                     SetProjectVersion(project, version);
+                }
+                catch
+                {
+                }
 
-                    // AssemblyInfo Files
+                try
+                {
                     SetAssemblyInfoVersion(project, version);
                 }
                 catch
@@ -89,22 +110,35 @@ namespace SemanticVersioning
 
         private void SetProjectVersion(Project project, Version version)
         {
-            var xmlDoc = new XmlDocument();
-            xmlDoc.Load(project.FileName);
+            try
+            {
+                var xmlDoc = new XmlDocument();
+                xmlDoc.Load(project.FileName);
 
-            var xmlNode = xmlDoc.SelectSingleNode("Project/PropertyGroup/Version");
-            xmlNode.InnerText = version.ToString();
+                var xmlNode = xmlDoc.SelectSingleNode("Project/PropertyGroup/Version");
 
-            xmlDoc.Save(project.FileName);
+                if (xmlNode == default(XmlNode))
+                {
+                    var assemblyInfoFiles = GetAssemblyInfoFiles(project);
+
+                    if (assemblyInfoFiles == default(IEnumerable<string>) || !assemblyInfoFiles.Any())
+                        xmlNode = xmlDoc.SelectSingleNode("Project/PropertyGroup").AppendChild(xmlDoc.CreateNode(XmlNodeType.Element, "Version", null));
+                }
+
+                xmlNode.InnerText = version.ToString();
+
+                xmlDoc.Save(project.FileName);
+            }
+            catch
+            {
+            }
         }
 
         private void SetAssemblyInfoVersion(Project project, Version version)
         {
-            var projectDirectory = Path.GetDirectoryName(project.FileName);
-            var projectFiles = Directory.GetFiles(projectDirectory, "*", SearchOption.AllDirectories);
-            var assemblyInfoFiles = projectFiles?.Where(x => !x.Contains("bin") && !x.Contains("obj")).Where(x => x.EndsWith("AssemblyInfo.cs"));
+            var assemblyInfoFiles = GetAssemblyInfoFiles(project);
 
-            if (assemblyInfoFiles == default(IEnumerable<string>))
+            if (assemblyInfoFiles == default(IEnumerable<string>) || !assemblyInfoFiles.Any())
                 return;
 
             foreach (var assemblyInfoFile in assemblyInfoFiles)
@@ -164,6 +198,23 @@ namespace SemanticVersioning
                 {
                 }
             }
+        }
+
+        private IEnumerable<string> GetAssemblyInfoFiles(Project project)
+        {
+            IEnumerable<string> assemblyInfoFiles = default(IEnumerable<string>);
+
+            try
+            {
+                var projectDirectory = Path.GetDirectoryName(project.FileName);
+                var projectFiles = Directory.GetFiles(projectDirectory, "*", SearchOption.AllDirectories);
+                assemblyInfoFiles = projectFiles.Where(x => !x.Contains("bin") && !x.Contains("obj")).Where(x => x.EndsWith("AssemblyInfo.cs"));
+            }
+            catch
+            {
+            }
+
+            return assemblyInfoFiles;
         }
     }
 }
