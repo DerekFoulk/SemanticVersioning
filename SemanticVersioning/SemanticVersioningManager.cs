@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -151,7 +152,7 @@ namespace SemanticVersioning
                     {
                         var lines = File.ReadLines($"{assemblyInfoFile}.bak");
 
-                        using (var file = new StreamWriter(assemblyInfoFile))
+                        using (var file = new StreamWriter(assemblyInfoFile, true, new UTF8Encoding(true)))
                         {
                             foreach (var line in lines)
                             {
