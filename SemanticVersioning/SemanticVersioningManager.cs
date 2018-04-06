@@ -156,7 +156,7 @@ namespace SemanticVersioning
                         {
                             foreach (var line in lines)
                             {
-                                if (line.Contains("AssemblyVersion"))
+                                if (line.Contains("AssemblyVersion") && !line.Trim().StartsWith("//"))
                                 {
                                     var pattern = "AssemblyVersion\\(\"(\\d+|\\d+(\\.\\d+)+)\\.*\\**\"\\)";
 
@@ -164,7 +164,7 @@ namespace SemanticVersioning
 
                                     file.WriteLine(updatedLine);
                                 }
-                                else if (line.Contains("AssemblyFileVersion"))
+                                else if (line.Contains("AssemblyFileVersion") && !line.Trim().StartsWith("//"))
                                 {
                                     var pattern = "AssemblyFileVersion\\(\"(\\d+|\\d+(\\.\\d+)+)\\.*\\**\"\\)";
 
