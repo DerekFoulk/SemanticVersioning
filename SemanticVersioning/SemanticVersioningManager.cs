@@ -60,11 +60,11 @@ namespace SemanticVersioning
                     try
                     {
                         var file = File.ReadAllText(assemblyInfoFile);
-                        var matches = Regex.Matches(file, "Assembly(File)*Version\\(\"(\\d+|\\d+(\\.\\d+)+)\\.*\\**\"\\)");
+                        var matches = Regex.Matches(file, RegexPatterns.AssemblyInfoVersions);
 
                         foreach (Match match in matches)
                         {
-                            var versionInMatch = Regex.Match(match.Value, @"\d+(\.\d+)*").Value;
+                            var versionInMatch = Regex.Match(match.Value, RegexPatterns.VersionNumbers).Value;
                             versions.Add(new Version(versionInMatch));
                         }
                     }
@@ -156,19 +156,15 @@ namespace SemanticVersioning
                         {
                             foreach (var line in lines)
                             {
-                                if (line.Contains("AssemblyVersion") && !line.Trim().StartsWith("//"))
+                                if (line.Contains("AssemblyVersion"))
                                 {
-                                    var pattern = "AssemblyVersion\\(\"(\\d+|\\d+(\\.\\d+)+)\\.*\\**\"\\)";
-
-                                    var updatedLine = Regex.Replace(line, pattern, $"AssemblyVersion(\"{version.ToAssemblyVersionString()}\")");
+                                    var updatedLine = Regex.Replace(line, RegexPatterns.AssemblyVersion, $"AssemblyVersion(\"{version.ToAssemblyVersionString()}\")");
 
                                     file.WriteLine(updatedLine);
                                 }
-                                else if (line.Contains("AssemblyFileVersion") && !line.Trim().StartsWith("//"))
+                                else if (line.Contains("AssemblyFileVersion"))
                                 {
-                                    var pattern = "AssemblyFileVersion\\(\"(\\d+|\\d+(\\.\\d+)+)\\.*\\**\"\\)";
-
-                                    var updatedLine = Regex.Replace(line, pattern, $"AssemblyFileVersion(\"{version.ToAssemblyVersionString()}\")");
+                                    var updatedLine = Regex.Replace(line, RegexPatterns.AssemblyFileVersion, $"AssemblyFileVersion(\"{version.ToAssemblyVersionString()}\")");
 
                                     file.WriteLine(updatedLine);
                                 }
