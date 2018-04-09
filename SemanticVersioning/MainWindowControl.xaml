@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="SemanticVersioning.MainWindowControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+             Background="{DynamicResource {x:Static vsshell:VsBrushes.WindowKey}}"
+             Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"
+             Name="MyToolWindow">
+    <Grid ShowGridLines="False"
+          Margin="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock Text="Major"
+                   Grid.Row="0"
+                   Grid.Column="0"
+                   HorizontalAlignment="Center"
+                   Margin="5" />
+        <TextBlock Text="Minor"
+                   Grid.Row="0"
+                   Grid.Column="1"
+                   HorizontalAlignment="Center"
+                   Margin="5" />
+        <TextBlock Text="Patch"
+                   Grid.Row="0"
+                   Grid.Column="2"
+                   HorizontalAlignment="Center"
+                   Margin="5" />
+        <TextBlock Text="Build"
+                   Grid.Row="0"
+                   Grid.Column="3"
+                   HorizontalAlignment="Center"
+                   Margin="5" />
+
+        <TextBox Name="MajorTextBox"
+                 Text="{Binding Version.Major, TargetNullValue='', Mode=TwoWay}"
+                 Grid.Row="1"
+                 Grid.Column="0"
+                 Margin="5" />
+        <TextBox Name="MinorTextBox"
+                 Text="{Binding Version.Minor, TargetNullValue='', Mode=TwoWay}"
+                 Grid.Row="1"
+                 Grid.Column="1"
+                 Margin="5" />
+        <TextBox Name="PatchTextBox"
+                 Text="{Binding Version.Patch, TargetNullValue='', Mode=TwoWay}"
+                 Grid.Row="1"
+                 Grid.Column="2"
+                 Margin="5" />
+        <TextBox Name="BuildTextBox"
+                 Text="{Binding Version.Build, TargetNullValue='', Mode=TwoWay}"
+                 Grid.Row="1"
+                 Grid.Column="3"
+                 Margin="5" />
+
+        <Button Name="UpdateButton"
+                Content="Update"
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Margin="5"
+                Padding="5"
+                Click="UpdateButton_Click" />
+    </Grid>
+</UserControl>
