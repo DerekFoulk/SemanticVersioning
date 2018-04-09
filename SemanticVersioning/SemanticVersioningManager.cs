@@ -43,8 +43,26 @@ namespace SemanticVersioning
 
                 try
                 {
-                    var projectVersion = project.Properties.Item("Version").Value.ToString();
-                    versions.Add(new Version(projectVersion));
+                    var version = project.Properties.Item("Version").Value.ToString();
+                    versions.Add(new Version(version));
+                }
+                catch
+                {
+                }
+
+                try
+                {
+                    var version = project.Properties.Item("AssemblyVersion").Value.ToString();
+                    versions.Add(new Version(version));
+                }
+                catch
+                {
+                }
+
+                try
+                {
+                    var version = project.Properties.Item("FileVersion").Value.ToString();
+                    versions.Add(new Version(version));
                 }
                 catch
                 {
@@ -113,22 +131,32 @@ namespace SemanticVersioning
         {
             try
             {
-                var xmlDoc = new XmlDocument();
-                xmlDoc.Load(project.FileName);
+                var projectXml = new XmlDocument();
+                projectXml.Load(project.FileName);
 
-                var xmlNode = xmlDoc.SelectSingleNode("Project/PropertyGroup/Version");
+                var versionNode = projectXml.SelectSingleNode("Project/PropertyGroup/Version");
 
-                if (xmlNode == default(XmlNode))
+                if (versionNode == default(XmlNode))
                 {
                     var assemblyInfoFiles = GetAssemblyInfoFiles(project);
 
                     if (assemblyInfoFiles == default(IEnumerable<string>) || !assemblyInfoFiles.Any())
-                        xmlNode = xmlDoc.SelectSingleNode("Project/PropertyGroup").AppendChild(xmlDoc.CreateNode(XmlNodeType.Element, "Version", null));
+                        versionNode = projectXml.SelectSingleNode("Project/PropertyGroup").AppendChild(projectXml.CreateNode(XmlNodeType.Element, "Version", null));
                 }
 
-                xmlNode.InnerText = version.ToString();
+                versionNode.InnerText = version.ToString();
 
-                xmlDoc.Save(project.FileName);
+                var assemblyVersionNode = projectXml.SelectSingleNode("Project/PropertyGroup/AssemblyVersion");
+
+                if (assemblyVersionNode != default(XmlNode))
+                    assemblyVersionNode.ParentNode.RemoveChild(assemblyVersionNode);
+
+                var fileVersionNode = projectXml.SelectSingleNode("Project/PropertyGroup/FileVersion");
+
+                if (fileVersionNode != default(XmlNode))
+                    fileVersionNode.ParentNode.RemoveChild(fileVersionNode);
+
+                projectXml.Save(project.FileName);
             }
             catch
             {
