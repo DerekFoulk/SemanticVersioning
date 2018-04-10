@@ -22,7 +22,7 @@
 
             DataContext = this;
 
-            Version = SemanticVersioningManager.Instance.CurrentVersion;
+            Version = SemanticVersioningManager.Instance.Version;
 
             MainWindowCommand.Instance.WindowOpened += Refresh;
             mainWindow.DocumentSaved += Refresh;
@@ -32,12 +32,12 @@
 
         private void Refresh(object sender, EventArgs e)
         {
-            Version = SemanticVersioningManager.Instance.CurrentVersion;
+            Version = SemanticVersioningManager.Instance.Version;
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            SemanticVersioningManager.Instance.SetVersion(Version);
+            SemanticVersioningManager.Instance.Version = Version;
         }
     }
 }

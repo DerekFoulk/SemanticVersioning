@@ -20,109 +20,106 @@ namespace SemanticVersioning
 
         public static SemanticVersioningManager Instance { get; private set; }
 
-        public Version CurrentVersion => GetVersion();
-
-        public static void Initialize(DTE dte)
+        public Version Version
         {
-            Instance = new SemanticVersioningManager(dte);
-        }
-
-        private Version GetVersion()
-        {
-            var projects = _dte.Solution?.Projects;
-
-            if (projects == default(Projects))
-                return null;
-
-            var versions = new List<Version>();
-
-            foreach (Project project in projects)
+            get
             {
-                if (string.IsNullOrWhiteSpace(project.FileName))
-                    continue;
+                var projects = _dte.Solution?.Projects;
 
-                try
-                {
-                    var version = project.Properties.Item("Version").Value.ToString();
-                    versions.Add(new Version(version));
-                }
-                catch
-                {
-                }
+                if (projects == default(Projects))
+                    return null;
 
-                try
-                {
-                    var version = project.Properties.Item("AssemblyVersion").Value.ToString();
-                    versions.Add(new Version(version));
-                }
-                catch
-                {
-                }
+                var versions = new List<Version>();
 
-                try
+                foreach (Project project in projects)
                 {
-                    var version = project.Properties.Item("FileVersion").Value.ToString();
-                    versions.Add(new Version(version));
-                }
-                catch
-                {
-                }
+                    if (string.IsNullOrWhiteSpace(project.FileName))
+                        continue;
 
-                var assemblyInfoFiles = GetAssemblyInfoFiles(project);
-
-                if (assemblyInfoFiles == default(IEnumerable<string>) || !assemblyInfoFiles.Any())
-                    continue;
-
-                foreach (var assemblyInfoFile in assemblyInfoFiles)
-                {
                     try
                     {
-                        var file = File.ReadAllText(assemblyInfoFile);
-                        var matches = Regex.Matches(file, RegexPatterns.AssemblyInfoVersions);
-
-                        foreach (Match match in matches)
-                        {
-                            var versionInMatch = Regex.Match(match.Value, RegexPatterns.VersionNumbers).Value;
-                            versions.Add(new Version(versionInMatch));
-                        }
+                        var version = project.Properties.Item("Version").Value.ToString();
+                        versions.Add(new Version(version));
                     }
                     catch
                     {
                     }
+
+                    try
+                    {
+                        var version = project.Properties.Item("AssemblyVersion").Value.ToString();
+                        versions.Add(new Version(version));
+                    }
+                    catch
+                    {
+                    }
+
+                    try
+                    {
+                        var version = project.Properties.Item("FileVersion").Value.ToString();
+                        versions.Add(new Version(version));
+                    }
+                    catch
+                    {
+                    }
+
+                    var assemblyInfoFiles = GetAssemblyInfoFiles(project);
+
+                    if (assemblyInfoFiles == default(IEnumerable<string>) || !assemblyInfoFiles.Any())
+                        continue;
+
+                    foreach (var assemblyInfoFile in assemblyInfoFiles)
+                    {
+                        try
+                        {
+                            var file = File.ReadAllText(assemblyInfoFile);
+                            var matches = Regex.Matches(file, RegexPatterns.AssemblyInfoVersions);
+
+                            foreach (Match match in matches)
+                            {
+                                var versionInMatch = Regex.Match(match.Value, RegexPatterns.VersionNumbers).Value;
+                                versions.Add(new Version(versionInMatch));
+                            }
+                        }
+                        catch
+                        {
+                        }
+                    }
                 }
+
+                var highestVersion = versions.OrderByDescending(x => x.ToAssemblyVersionString()).FirstOrDefault();
+
+                return highestVersion;
             }
-
-            var highestVersion = versions.OrderByDescending(x => x.ToAssemblyVersionString()).FirstOrDefault();
-
-            return highestVersion;
-        }
-
-        public void SetVersion(Version version)
-        {
-            var projects = _dte.Solution?.Projects;
-
-            if (projects == default(Projects))
-                return;
-
-            foreach (Project project in projects)
+            set
             {
-                if (string.IsNullOrWhiteSpace(project.FileName))
-                    continue;
+                var version = value;
 
-                try
-                {
-                    SetProjectVersion(project, version);
-                }
-                catch
-                {
-                }
+                var projects = _dte.Solution?.Projects;
 
-                try
+                if (projects == default(Projects))
+                    return;
+
+                foreach (Project project in projects)
                 {
-                    SetAssemblyInfoVersion(project, version);
-                }
-                catch
-                {
+                    if (string.IsNullOrWhiteSpace(project.FileName))
+                        continue;
+
+                    try
+                    {
+                        SetProjectVersion(project, version);
+                    }
+                    catch
+                    {
+                    }
+
+                    try
+                    {
+                        SetAssemblyInfoVersion(project, version);
+                    }
+                    catch
+                    {
+                    }
                 }
             }
         }
@@ -240,6 +237,11 @@ namespace SemanticVersioning
             }
 
             return assemblyInfoFiles;
+        }
+
+        public static void Initialize(DTE dte)
+        {
+            Instance = new SemanticVersioningManager(dte);
         }
     }
 }
