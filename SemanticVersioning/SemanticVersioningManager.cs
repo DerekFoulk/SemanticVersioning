@@ -64,27 +64,88 @@ namespace SemanticVersioning
                     {
                     }
 
-                    var assemblyInfoFiles = GetAssemblyInfoFiles(project);
-
-                    if (assemblyInfoFiles == default(IEnumerable<string>) || !assemblyInfoFiles.Any())
-                        continue;
-
-                    foreach (var assemblyInfoFile in assemblyInfoFiles)
+                    try
                     {
-                        try
-                        {
-                            var file = File.ReadAllText(assemblyInfoFile);
-                            var matches = Regex.Matches(file, RegexPatterns.AssemblyInfoVersions);
+                        var assemblyInfoFiles = GetAssemblyInfoFiles(project);
 
-                            foreach (Match match in matches)
+                        if (assemblyInfoFiles == default(IEnumerable<string>) || !assemblyInfoFiles.Any())
+                            continue;
+
+                        foreach (var assemblyInfoFile in assemblyInfoFiles)
+                        {
+                            try
                             {
-                                var versionInMatch = Regex.Match(match.Value, RegexPatterns.VersionNumbers).Value;
-                                versions.Add(new Version(versionInMatch));
+                                var file = File.ReadAllText(assemblyInfoFile);
+                                var matches = Regex.Matches(file, RegexPatterns.AssemblyInfoVersions);
+
+                                foreach (Match match in matches)
+                                {
+                                    var versionInMatch = Regex.Match(match.Value, RegexPatterns.VersionNumbers).Value;
+                                    versions.Add(new Version(versionInMatch));
+                                }
+                            }
+                            catch
+                            {
                             }
                         }
-                        catch
+                    }
+                    catch
+                    {
+                    }
+
+                    try
+                    {
+                        var androidManifestFiles = GetAndroidManifestFiles(project);
+
+                        foreach (string androidManifestFile in androidManifestFiles)
                         {
+                            try
+                            {
+                                var xDocument = XDocument.Load(androidManifestFile);
+                                XNamespace xNamespace = "http://schemas.android.com/apk/res/android";
+
+                                var manifests = xDocument?.Elements("manifest");
+
+                                foreach (XElement manifest in manifests)
+                                {
+                                    var version = manifest?.Attribute(xNamespace + "versionName")?.Value;
+                                    versions.Add(new Version(version));
+                                }
+                            }
+                            catch
+                            {
+                            }
                         }
+                    }
+                    catch (Exception e)
+                    {
+                    }
+
+                    try
+                    {
+                        var infoFiles = GetInfoFiles(project);
+
+                        foreach (string infoFile in infoFiles)
+                        {
+                            try
+                            {
+                                var xDocument = XDocument.Load(infoFile);
+
+                                var keyNode = xDocument?.Element("plist")?.Element("dict")?.Descendants("key")?.FirstOrDefault(x => x.Value == "CFBundleShortVersionString");
+
+                                if (keyNode?.NextNode is XElement valueNode && valueNode.Name == "string")
+                                {
+                                    var version = valueNode.Value;
+                                    versions.Add(new Version(version));
+                                }
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
                     }
                 }
 
@@ -257,8 +318,7 @@ namespace SemanticVersioning
 
         private void SetXamarinAndroidVersion(Project project, Version version)
         {
-            var projectDirectory = Path.GetDirectoryName(project.FileName);
-            var androidManifestFiles = Directory.GetFiles(projectDirectory, "*AndroidManifest.xml", SearchOption.AllDirectories).Where(x => !x.Contains(@"\obj\") && !x.Contains(@"\bin\"));
+            var androidManifestFiles = GetAndroidManifestFiles(project);
 
             foreach (string androidManifestFile in androidManifestFiles)
             {
@@ -284,8 +344,7 @@ namespace SemanticVersioning
 
         private void SetXamarinIosVersion(Project project, Version version)
         {
-            var projectDirectory = Path.GetDirectoryName(project.FileName);
-            var infoFiles = Directory.GetFiles(projectDirectory, "*Info.plist", SearchOption.AllDirectories).Where(x => !x.Contains(@"\obj\") && !x.Contains(@"\bin\"));
+            var infoFiles = GetInfoFiles(project);
 
             foreach (string infoFile in infoFiles)
             {
@@ -340,19 +399,27 @@ namespace SemanticVersioning
 
         private IEnumerable<string> GetAssemblyInfoFiles(Project project)
         {
-            IEnumerable<string> assemblyInfoFiles = default(IEnumerable<string>);
-
-            try
-            {
-                var projectDirectory = Path.GetDirectoryName(project.FileName);
-                var projectFiles = Directory.GetFiles(projectDirectory, "*", SearchOption.AllDirectories);
-                assemblyInfoFiles = projectFiles.Where(x => !x.Contains("bin") && !x.Contains("obj")).Where(x => x.EndsWith("AssemblyInfo.cs"));
-            }
-            catch
-            {
-            }
+            var projectDirectory = Path.GetDirectoryName(project.FileName);
+            var projectFiles = Directory.GetFiles(projectDirectory, "*", SearchOption.AllDirectories);
+            var assemblyInfoFiles = projectFiles.Where(x => !x.Contains("bin") && !x.Contains("obj")).Where(x => x.EndsWith("AssemblyInfo.cs"));
 
             return assemblyInfoFiles;
+        }
+
+        private IEnumerable<string> GetAndroidManifestFiles(Project project)
+        {
+            var projectDirectory = Path.GetDirectoryName(project.FileName);
+            var androidManifestFiles = Directory.GetFiles(projectDirectory, "*AndroidManifest.xml", SearchOption.AllDirectories).Where(x => !x.Contains(@"\obj\") && !x.Contains(@"\bin\"));
+
+            return androidManifestFiles;
+        }
+
+        private IEnumerable<string> GetInfoFiles(Project project)
+        {
+            var projectDirectory = Path.GetDirectoryName(project.FileName);
+            var infoFiles = Directory.GetFiles(projectDirectory, "*Info.plist", SearchOption.AllDirectories).Where(x => !x.Contains(@"\obj\") && !x.Contains(@"\bin\"));
+
+            return infoFiles;
         }
 
         public static void Initialize(DTE dte)
