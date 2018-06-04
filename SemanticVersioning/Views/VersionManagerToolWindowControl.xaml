@@ -9,10 +9,49 @@
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              Name="MyToolWindow">
+    <UserControl.Resources>
+        <Style TargetType="Grid">
+            <Setter Property="Margin" Value="5" />
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="5, 0" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+        </Style>
+    </UserControl.Resources>
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <TextBlock Margin="10" HorizontalAlignment="Center">VersionManagerToolWindow</TextBlock>
-            <Button Content="Click me!" Click="button1_Click" Width="120" Height="80" Name="button1"/>
-        </StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Major"
+                   Grid.Row="0" Grid.Column="0" />
+        <TextBlock Text="Minor"
+                   Grid.Row="0" Grid.Column="1" />
+        <TextBlock Text="Patch"
+                   Grid.Row="0" Grid.Column="2" />
+        <TextBlock Text="Build"
+                   Grid.Row="0" Grid.Column="3" />
+
+        <TextBox Text="{Binding Version.Major, TargetNullValue='', Mode=TwoWay}"
+                 Grid.Row="1" Grid.Column="0" />
+        <TextBox Text="{Binding Version.Minor, TargetNullValue='', Mode=TwoWay}"
+                 Grid.Row="1" Grid.Column="1" />
+        <TextBox Text="{Binding Version.Patch, TargetNullValue='', Mode=TwoWay}"
+                 Grid.Row="1" Grid.Column="2" />
+        <TextBox Text="{Binding Version.Build, TargetNullValue='', Mode=TwoWay}"
+                 Grid.Row="1" Grid.Column="3" />
     </Grid>
 </UserControl>
