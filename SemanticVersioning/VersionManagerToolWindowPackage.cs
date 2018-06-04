@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
+using SemanticVersioning.Services;
 
 namespace SemanticVersioning
 {
@@ -63,6 +64,8 @@ namespace SemanticVersioning
         {
             VersionManagerToolWindowCommand.Initialize(this);
             base.Initialize();
+
+            DteService.Initialize(this);
         }
 
         #endregion
