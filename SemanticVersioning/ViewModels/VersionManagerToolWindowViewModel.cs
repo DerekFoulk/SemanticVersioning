@@ -20,5 +20,10 @@ namespace SemanticVersioning.ViewModels
         {
             Version = _versionService.GetHighestVersion();
         }
+
+        public void Update()
+        {
+            _versionService.SetVersions(Version);
+        }
     }
 }

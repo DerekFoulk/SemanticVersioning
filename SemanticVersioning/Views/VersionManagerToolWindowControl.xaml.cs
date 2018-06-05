@@ -50,5 +50,15 @@
             if (isVisible)
                 _versionManagerToolWindowViewModel.Load();
         }
+
+        private void OnRefreshButtonClick(object sender, RoutedEventArgs e)
+        {
+            _versionManagerToolWindowViewModel.Load();
+        }
+
+        private void OnUpdateButtonClick(object sender, RoutedEventArgs e)
+        {
+            _versionManagerToolWindowViewModel.Update();
+        }
     }
 }

@@ -23,6 +23,10 @@
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="VerticalAlignment" Value="Stretch" />
         </Style>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Padding" Value="5" />
+        </Style>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -32,6 +36,8 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -53,5 +59,17 @@
                  Grid.Row="1" Grid.Column="2" />
         <TextBox Text="{Binding Version.Build, TargetNullValue='', Mode=TwoWay}"
                  Grid.Row="1" Grid.Column="3" />
+
+        <Button Content="Refresh"
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Click="OnRefreshButtonClick" />
+
+        <Button Content="Update"
+                Grid.Row="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Click="OnUpdateButtonClick" />
     </Grid>
 </UserControl>
