@@ -10,6 +10,8 @@
     /// </summary>
     public partial class VersionManagerToolWindowControl : UserControl
     {
+        private VersionManagerToolWindowViewModel _versionManagerToolWindowViewModel;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionManagerToolWindowControl"/> class.
         /// </summary>
@@ -17,7 +19,17 @@
         {
             this.InitializeComponent();
 
-            DataContext = new VersionManagerToolWindowViewModel();
+            DataContext = _versionManagerToolWindowViewModel = new VersionManagerToolWindowViewModel();
+
+            IsVisibleChanged += OnIsVisibleChanged;
+        }
+
+        private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var isVisible = (bool)e.NewValue;
+
+            if (isVisible)
+                _versionManagerToolWindowViewModel.Load();
         }
     }
 }

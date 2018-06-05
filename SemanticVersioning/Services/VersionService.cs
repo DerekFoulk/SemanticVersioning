@@ -14,8 +14,6 @@ namespace SemanticVersioning.Services
         internal VersionService()
         {
             _dte = DteService.Instance.DTE;
-
-            LoadProjects();
         }
 
         private void LoadProjects()
@@ -32,6 +30,8 @@ namespace SemanticVersioning.Services
 
         internal Version GetHighestVersion()
         {
+            LoadProjects();
+
             var versions = _projects.SelectMany(x => x.Files.Where(y => !y.Versions.IsNullOrEmpty()).SelectMany(y => y.Versions));
 
             var uniqueVersions = versions.GroupBy(x => new
@@ -57,6 +57,8 @@ namespace SemanticVersioning.Services
         {
             if (version.IsNullOrEmpty())
                 throw new System.ArgumentException();
+
+            LoadProjects();
 
             foreach (Project project in _projects)
             {
