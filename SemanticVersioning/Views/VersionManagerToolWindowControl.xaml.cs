@@ -7,6 +7,8 @@
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Data;
+    using System.Windows.Input;
 
     /// <summary>
     /// Interaction logic for VersionManagerToolWindowControl.
@@ -59,6 +61,36 @@
         private void OnUpdateButtonClick(object sender, RoutedEventArgs e)
         {
             _versionManagerToolWindowViewModel.Update();
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox_SelectAll(sender);
+        }
+
+        private void TextBox_GotMouseCapture(object sender, MouseEventArgs e)
+        {
+            TextBox_SelectAll(sender);
+        }
+
+        private void TextBox_SelectAll(object sender)
+        {
+            var textBox = sender as TextBox;
+
+            textBox.SelectAll();
+        }
+
+        private void TextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                // Update binding source (necessary because the binding source is not updated until the TextBox loses focus by default)
+                var textBox = sender as TextBox;
+                var bindingExpression = BindingOperations.GetBindingExpression(textBox, TextBox.TextProperty);
+                bindingExpression?.UpdateSource();
+
+                _versionManagerToolWindowViewModel.Update();
+            }
         }
     }
 }
