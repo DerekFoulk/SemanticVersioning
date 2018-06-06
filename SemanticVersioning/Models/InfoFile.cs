@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -24,12 +25,11 @@ namespace SemanticVersioning.Models
             var xDocument = XDocument.Load(FileName);
 
             var keyNode = xDocument?.Element("plist")?.Element("dict")?.Descendants("key")?.FirstOrDefault(x => x.Value == "CFBundleShortVersionString");
-
-            if (keyNode?.NextNode is XElement valueNode && valueNode.Name == "string")
+            RunIfKvpExists(keyNode, "string", (valueNode) =>
             {
                 var version = valueNode.Value;
                 versions.Add(new Version(version));
-            }
+            });
 
             return versions.Any() ? versions : null;
         }
@@ -44,7 +44,23 @@ namespace SemanticVersioning.Models
 
             AddOrUpdate("CFBundleShortVersionString", version.ToString(), dict);
 
+            int bundleVersion = default(int);
+            var bundleVersionNode = dict?.Descendants("key")?.FirstOrDefault(x => x.Value == "CFBundleVersion");
+
+            RunIfKvpExists(bundleVersionNode, "string", (bundleVersionValueNode) =>
+            {
+                bundleVersion = decimal.TryParse(bundleVersionValueNode.Value, out decimal result) ? (int)result : 0;
+            });
+
+            AddOrUpdate("CFBundleVersion", $"{++bundleVersion}", dict);
+
             xDocument?.Save(FileName);
+        }
+
+        private void RunIfKvpExists(XElement keyNode, string valueNodeName, Action<XElement> action)
+        {
+            if (keyNode?.NextNode is XElement valueNode && valueNode.Name == valueNodeName)
+                action.Invoke(valueNode);
         }
 
         private void AddOrUpdate(string key, string value, XElement dict)
@@ -68,8 +84,10 @@ namespace SemanticVersioning.Models
             }
             else
             {
-                if (keyElement?.NextNode is XElement valueElement && valueElement.Name == "string")
-                    valueElement.Value = value;
+                RunIfKvpExists(keyElement, "string", (valueNode) =>
+                {
+                    valueNode.Value = value;
+                });
             }
         }
     }

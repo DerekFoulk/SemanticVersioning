@@ -37,6 +37,10 @@ namespace SemanticVersioning.Models
 
             xDocument?.Element("manifest")?.SetAttributeValue(xNamespace + "versionName", version.ToString());
 
+            var versionCodeValue = xDocument?.Element("manifest")?.Attribute(xNamespace + "versionCode")?.Value;
+            var versionCode = decimal.TryParse(versionCodeValue, out decimal result) ? (int)result : 0;
+            xDocument?.Element("manifest")?.SetAttributeValue(xNamespace + "versionCode", ++versionCode);
+
             xDocument?.Save(FileName);
         }
     }
