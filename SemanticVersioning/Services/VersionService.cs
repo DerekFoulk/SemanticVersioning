@@ -22,7 +22,13 @@ namespace SemanticVersioning.Services
 
             foreach (EnvDTE.Project project in _dte.Solution.Projects)
             {
-                projects.Add(new Project(project));
+                try
+                {
+                    projects.Add(new Project(project));
+                }
+                catch
+                {
+                }
             }
 
             _projects = projects;
