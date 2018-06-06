@@ -106,21 +106,26 @@ namespace SemanticVersioning.Models
                 case ProjectType.NetCore:
                     TryAddFiles(files, projectDirectory, typeof(ProjectFile), "*.csproj");
                     break;
+
                 case ProjectType.NetStandard:
                     TryAddFiles(files, projectDirectory, typeof(ProjectFile), "*.csproj");
                     break;
+
                 case ProjectType.XamarinAndroid:
                     TryAddFiles(files, projectDirectory, typeof(AssemblyInfoFile), "*AssemblyInfo.cs");
                     TryAddFiles(files, projectDirectory, typeof(AndroidManifestFile), "*AndroidManifest.xml");
                     break;
+
                 case ProjectType.XamarinIos:
                     TryAddFiles(files, projectDirectory, typeof(AssemblyInfoFile), "*AssemblyInfo.cs");
                     TryAddFiles(files, projectDirectory, typeof(InfoFile), "*Info.plist");
                     break;
+
                 case ProjectType.Uwp:
                     TryAddFiles(files, projectDirectory, typeof(AssemblyInfoFile), "*AssemblyInfo.cs");
                     TryAddFiles(files, projectDirectory, typeof(PackageFile), "*Package.appxmanifest");
                     break;
+
                 default:
                     TryAddFiles(files, projectDirectory, typeof(AssemblyInfoFile), "*AssemblyInfo.cs");
                     break;

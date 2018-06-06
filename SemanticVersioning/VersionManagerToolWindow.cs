@@ -1,11 +1,11 @@
 ﻿namespace SemanticVersioning
 {
-    using System;
-    using System.Runtime.InteropServices;
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
     using SemanticVersioning.Views;
+    using System;
+    using System.Runtime.InteropServices;
 
     /// <summary>
     /// This class implements the tool window exposed by this package and hosts a user control.
