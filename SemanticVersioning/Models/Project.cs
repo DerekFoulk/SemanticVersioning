@@ -13,6 +13,9 @@ namespace SemanticVersioning.Models
 
         public Project(EnvDTE.Project project)
         {
+            if (String.IsNullOrWhiteSpace(project.FileName))
+                throw new ArgumentException("Project does not exist.", "project");
+
             _project = project;
 
             FileName = project.FileName;
