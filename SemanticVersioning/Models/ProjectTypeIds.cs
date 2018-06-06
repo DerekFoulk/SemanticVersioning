@@ -4,23 +4,24 @@ namespace SemanticVersioning.Models
 {
     public static class ProjectTypeIds
     {
-        public static readonly Dictionary<ProjectType, List<string>> TargetFrameworks = new Dictionary<ProjectType, List<string>>
-        {
+        public static readonly Dictionary<ProjectType, List<string>> TargetFrameworks =
+            new Dictionary<ProjectType, List<string>>
             {
-                ProjectType.NetCore,
-                new List<string>
                 {
-                    "netcoreapp"
-                }
-            },
-            {
-                ProjectType.NetStandard,
-                new List<string>
+                    ProjectType.NetCore,
+                    new List<string>
+                    {
+                        "netcoreapp"
+                    }
+                },
                 {
-                    "netstandard"
+                    ProjectType.NetStandard,
+                    new List<string>
+                    {
+                        "netstandard"
+                    }
                 }
-            }
-        };
+            };
 
         public static readonly Dictionary<ProjectType, List<string>> Guids = new Dictionary<ProjectType, List<string>>
         {

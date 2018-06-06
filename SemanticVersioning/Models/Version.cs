@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace SemanticVersioning.Models
 {
@@ -11,7 +10,7 @@ namespace SemanticVersioning.Models
 
         public Version(string version)
         {
-            if (TryParse(version, out Version result))
+            if (TryParse(version, out var result))
             {
                 Major = result.Major;
                 Minor = result.Minor;
@@ -32,7 +31,7 @@ namespace SemanticVersioning.Models
         {
             result = null;
 
-            if (String.IsNullOrWhiteSpace(s))
+            if (string.IsNullOrWhiteSpace(s))
                 return false;
 
             var input = s.Trim();

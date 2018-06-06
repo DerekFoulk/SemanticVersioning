@@ -1,5 +1,5 @@
-﻿using SemanticVersioning.Models;
-using System.Linq;
+﻿using System.Linq;
+using SemanticVersioning.Models;
 
 namespace SemanticVersioning.Extensions
 {

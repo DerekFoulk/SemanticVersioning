@@ -1,47 +1,47 @@
-﻿namespace SemanticVersioning
-{
-    using System;
-    using System.Runtime.InteropServices;
-    using Microsoft.VisualStudio;
-    using Microsoft.VisualStudio.Shell;
-    using Microsoft.VisualStudio.Shell.Interop;
-    using SemanticVersioning.Views;
+﻿using System;
+using System.Runtime.InteropServices;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using SemanticVersioning.Views;
 
+namespace SemanticVersioning
+{
     /// <summary>
-    /// This class implements the tool window exposed by this package and hosts a user control.
+    ///     This class implements the tool window exposed by this package and hosts a user control.
     /// </summary>
     /// <remarks>
-    /// In Visual Studio tool windows are composed of a frame (implemented by the shell) and a pane,
-    /// usually implemented by the package implementer.
-    /// <para>
-    /// This class derives from the ToolWindowPane class provided from the MPF in order to use its
-    /// implementation of the IVsUIElementPane interface.
-    /// </para>
+    ///     In Visual Studio tool windows are composed of a frame (implemented by the shell) and a pane,
+    ///     usually implemented by the package implementer.
+    ///     <para>
+    ///         This class derives from the ToolWindowPane class provided from the MPF in order to use its
+    ///         implementation of the IVsUIElementPane interface.
+    ///     </para>
     /// </remarks>
     [Guid("f4199493-3695-4a7e-9410-1cb07e49f120")]
     public class VersionManagerToolWindow : ToolWindowPane, IVsRunningDocTableEvents
     {
-        private uint rdtCookie;
         private IVsRunningDocumentTable rdt;
+        private uint rdtCookie;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VersionManagerToolWindow"/> class.
+        ///     Initializes a new instance of the <see cref="VersionManagerToolWindow" /> class.
         /// </summary>
         public VersionManagerToolWindow() : base(null)
         {
-            this.Caption = "Version Manager";
+            Caption = "Version Manager";
 
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
             // the object returned by the Content property.
-            this.Content = new VersionManagerToolWindowControl(this);
+            Content = new VersionManagerToolWindowControl(this);
         }
 
         protected override void Initialize()
         {
             base.Initialize();
 
-            rdt = (IVsRunningDocumentTable)GetService(typeof(SVsRunningDocumentTable));
+            rdt = (IVsRunningDocumentTable) GetService(typeof(SVsRunningDocumentTable));
             rdt.AdviseRunningDocTableEvents(this, out rdtCookie);
         }
 
@@ -53,16 +53,20 @@
             base.Dispose(disposing);
         }
 
+        public event EventHandler<DocumentSavedEventArgs> DocumentSaved;
+
         #region IVsRunningDocTableEvents
 
         // See https://docs.microsoft.com/en-us/visualstudio/extensibility/subscribing-to-an-event
 
-        public int OnAfterFirstDocumentLock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining)
+        public int OnAfterFirstDocumentLock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining,
+            uint dwEditLocksRemaining)
         {
             return VSConstants.S_OK;
         }
 
-        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining)
+        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining,
+            uint dwEditLocksRemaining)
         {
             return VSConstants.S_OK;
         }
@@ -71,16 +75,16 @@
         {
             var doc = rdt.GetDocumentInfo(
                 docCookie,
-                out uint pgrfRDTFlags,
-                out uint pdwReadLocks,
-                out uint pdwEditLocks,
-                out string pbstrMkDocument,
-                out IVsHierarchy ppHier,
-                out uint pitemid,
-                out IntPtr ppunkDocData
+                out var pgrfRDTFlags,
+                out var pdwReadLocks,
+                out var pdwEditLocks,
+                out var pbstrMkDocument,
+                out var ppHier,
+                out var pitemid,
+                out var ppunkDocData
             );
 
-            DocumentSavedEventArgs documentSavedEventArgs = new DocumentSavedEventArgs
+            var documentSavedEventArgs = new DocumentSavedEventArgs
             {
                 FullName = pbstrMkDocument
             };
@@ -106,7 +110,5 @@
         }
 
         #endregion IVsRunningDocTableEvents
-
-        public event EventHandler<DocumentSavedEventArgs> DocumentSaved;
     }
 }

@@ -1,28 +1,26 @@
-﻿namespace SemanticVersioning.Views
-{
-    using SemanticVersioning.ViewModels;
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Windows;
-    using System.Windows.Controls;
-    using System.Windows.Data;
-    using System.Windows.Input;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using SemanticVersioning.ViewModels;
 
+namespace SemanticVersioning.Views
+{
     /// <summary>
-    /// Interaction logic for VersionManagerToolWindowControl.
+    ///     Interaction logic for VersionManagerToolWindowControl.
     /// </summary>
     public partial class VersionManagerToolWindowControl : UserControl
     {
-        private VersionManagerToolWindowViewModel _versionManagerToolWindowViewModel;
+        private readonly VersionManagerToolWindowViewModel _versionManagerToolWindowViewModel;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VersionManagerToolWindowControl"/> class.
+        ///     Initializes a new instance of the <see cref="VersionManagerToolWindowControl" /> class.
         /// </summary>
         public VersionManagerToolWindowControl(VersionManagerToolWindow versionManagerToolWindow)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             DataContext = _versionManagerToolWindowViewModel = new VersionManagerToolWindowViewModel();
 
@@ -47,7 +45,7 @@
 
         private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var isVisible = (bool)e.NewValue;
+            var isVisible = (bool) e.NewValue;
 
             if (isVisible)
                 _versionManagerToolWindowViewModel.Load();

@@ -46,16 +46,17 @@ namespace SemanticVersioning.Models
                 using (var file = new StreamWriter(FileName, true, new UTF8Encoding(true)))
                 {
                     foreach (var line in lines)
-                    {
                         if (line.Contains("AssemblyVersion"))
                         {
-                            var updatedLine = Regex.Replace(line, RegexPatterns.AssemblyVersion, $"AssemblyVersion(\"{version.ToAssemblyVersionString()}\")");
+                            var updatedLine = Regex.Replace(line, RegexPatterns.AssemblyVersion,
+                                $"AssemblyVersion(\"{version.ToAssemblyVersionString()}\")");
 
                             file.WriteLine(updatedLine);
                         }
                         else if (line.Contains("AssemblyFileVersion"))
                         {
-                            var updatedLine = Regex.Replace(line, RegexPatterns.AssemblyFileVersion, $"AssemblyFileVersion(\"{version.ToAssemblyVersionString()}\")");
+                            var updatedLine = Regex.Replace(line, RegexPatterns.AssemblyFileVersion,
+                                $"AssemblyFileVersion(\"{version.ToAssemblyVersionString()}\")");
 
                             file.WriteLine(updatedLine);
                         }
@@ -63,7 +64,6 @@ namespace SemanticVersioning.Models
                         {
                             file.WriteLine(line);
                         }
-                    }
 
                     file.Close();
                 }
