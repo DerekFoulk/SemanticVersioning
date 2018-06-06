@@ -71,25 +71,15 @@ namespace SemanticVersioning.Models
                 .Where(x => !x.Contains(@"\obj\") && !x.Contains(@"\bin\"));
             foreach (var targetFile in targetFiles)
                 if (type == typeof(ProjectFile))
-                {
                     files.Add(new ProjectFile(targetFile));
-                }
                 else if (type == typeof(AssemblyInfoFile))
-                {
                     files.Add(new AssemblyInfoFile(targetFile));
-                }
                 else if (type == typeof(AndroidManifestFile))
-                {
                     files.Add(new AndroidManifestFile(targetFile));
-                }
                 else if (type == typeof(InfoFile))
-                {
                     files.Add(new InfoFile(targetFile));
-                }
                 else if (type == typeof(PackageFile))
-                {
                     files.Add(new PackageFile(targetFile));
-                }
         }
 
         private IEnumerable<IFile> GetFiles()
