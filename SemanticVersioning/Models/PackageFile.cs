@@ -25,7 +25,8 @@ namespace SemanticVersioning.Models
             var xDocument = XDocument.Load(FileName);
             XNamespace xNamespace = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
 
-            var version = xDocument?.Element(xNamespace + "Package")?.Element(xNamespace + "Identity")?.Attribute("Version")?.Value;
+            var version = xDocument?.Element(xNamespace + "Package")?.Element(xNamespace + "Identity")
+                ?.Attribute("Version")?.Value;
             versions.Add(new Version(version));
 
             return versions.Any() ? versions : null;
@@ -36,7 +37,8 @@ namespace SemanticVersioning.Models
             var xDocument = XDocument.Load(FileName);
             XNamespace xNamespace = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
 
-            xDocument?.Element(xNamespace + "Package")?.Element(xNamespace + "Identity")?.SetAttributeValue("Version", version.ToAssemblyVersionString());
+            xDocument?.Element(xNamespace + "Package")?.Element(xNamespace + "Identity")
+                ?.SetAttributeValue("Version", version.ToAssemblyVersionString());
 
             var xmlWriterSettings = new XmlWriterSettings
             {
@@ -44,7 +46,7 @@ namespace SemanticVersioning.Models
                 Indent = true
             };
 
-            using (XmlWriter xmlWriter = XmlWriter.Create(FileName, xmlWriterSettings))
+            using (var xmlWriter = XmlWriter.Create(FileName, xmlWriterSettings))
             {
                 xDocument?.Save(xmlWriter);
             }

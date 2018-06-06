@@ -1,9 +1,9 @@
-﻿using SemanticVersioning.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using SemanticVersioning.Extensions;
 
 namespace SemanticVersioning.Models
 {
@@ -13,7 +13,7 @@ namespace SemanticVersioning.Models
 
         public Project(EnvDTE.Project project)
         {
-            if (String.IsNullOrWhiteSpace(project.FileName))
+            if (string.IsNullOrWhiteSpace(project.FileName))
                 throw new ArgumentException("Project does not exist.", "project");
 
             _project = project;
@@ -25,9 +25,15 @@ namespace SemanticVersioning.Models
             Files = GetFiles();
         }
 
+        public string FileName { get; set; }
+
+        public ProjectType Type { get; set; }
+
+        public IEnumerable<IFile> Files { get; set; }
+
         private ProjectType GetProjectType()
         {
-            ProjectType projectType = default(ProjectType);
+            var projectType = default(ProjectType);
 
             var xDocument = XDocument.Load(FileName);
 
@@ -36,9 +42,10 @@ namespace SemanticVersioning.Models
                 .Element("PropertyGroup")?
                 .Element("TargetFramework")?.Value;
 
-            if (!String.IsNullOrWhiteSpace(targetFramework))
+            if (!string.IsNullOrWhiteSpace(targetFramework))
             {
-                projectType = ProjectTypeIds.TargetFrameworks.FirstOrDefault(x => x.Value.Any(y => targetFramework.Contains(y, StringComparison.OrdinalIgnoreCase))).Key;
+                projectType = ProjectTypeIds.TargetFrameworks.FirstOrDefault(x =>
+                    x.Value.Any(y => targetFramework.Contains(y, StringComparison.OrdinalIgnoreCase))).Key;
             }
             else
             {
@@ -49,9 +56,10 @@ namespace SemanticVersioning.Models
                     .Elements(xNamespace + "PropertyGroup")?
                     .Elements(xNamespace + "ProjectTypeGuids")?
                     .Select(x => x.Value)
-                    .SelectMany(x => x.Replace("{", String.Empty).Replace("}", String.Empty).Split(';'));
+                    .SelectMany(x => x.Replace("{", string.Empty).Replace("}", string.Empty).Split(';'));
 
-                projectType = projectTypeGuids.Select(x => ProjectTypeIds.Guids.FirstOrDefault(y => y.Value.Contains(x)).Key).FirstOrDefault();
+                projectType = projectTypeGuids
+                    .Select(x => ProjectTypeIds.Guids.FirstOrDefault(y => y.Value.Contains(x)).Key).FirstOrDefault();
             }
 
             return projectType;
@@ -59,40 +67,29 @@ namespace SemanticVersioning.Models
 
         private void TryAddFiles(List<IFile> files, string projectDirectory, Type type, string searchPattern = "*")
         {
-            var targetFiles = Directory.GetFiles(projectDirectory, searchPattern, SearchOption.AllDirectories).Where(x => !x.Contains(@"\obj\") && !x.Contains(@"\bin\"));
-            foreach (string targetFile in targetFiles)
-            {
+            var targetFiles = Directory.GetFiles(projectDirectory, searchPattern, SearchOption.AllDirectories)
+                .Where(x => !x.Contains(@"\obj\") && !x.Contains(@"\bin\"));
+            foreach (var targetFile in targetFiles)
                 if (type == typeof(ProjectFile))
                 {
                     files.Add(new ProjectFile(targetFile));
-
-                    continue;
                 }
                 else if (type == typeof(AssemblyInfoFile))
                 {
                     files.Add(new AssemblyInfoFile(targetFile));
-
-                    continue;
                 }
                 else if (type == typeof(AndroidManifestFile))
                 {
                     files.Add(new AndroidManifestFile(targetFile));
-
-                    continue;
                 }
                 else if (type == typeof(InfoFile))
                 {
                     files.Add(new InfoFile(targetFile));
-
-                    continue;
                 }
                 else if (type == typeof(PackageFile))
                 {
                     files.Add(new PackageFile(targetFile));
-
-                    continue;
                 }
-            }
         }
 
         private IEnumerable<IFile> GetFiles()
@@ -133,11 +130,5 @@ namespace SemanticVersioning.Models
 
             return files;
         }
-
-        public string FileName { get; set; }
-
-        public ProjectType Type { get; set; }
-
-        public IEnumerable<IFile> Files { get; set; }
     }
 }

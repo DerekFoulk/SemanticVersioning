@@ -24,8 +24,9 @@ namespace SemanticVersioning.Models
 
             var xDocument = XDocument.Load(FileName);
 
-            var keyNode = xDocument?.Element("plist")?.Element("dict")?.Descendants("key")?.FirstOrDefault(x => x.Value == "CFBundleShortVersionString");
-            RunIfKvpExists(keyNode, "string", (valueNode) =>
+            var keyNode = xDocument?.Element("plist")?.Element("dict")?.Descendants("key")
+                ?.FirstOrDefault(x => x.Value == "CFBundleShortVersionString");
+            RunIfKvpExists(keyNode, "string", valueNode =>
             {
                 var version = valueNode.Value;
                 versions.Add(new Version(version));
@@ -44,13 +45,14 @@ namespace SemanticVersioning.Models
 
             AddOrUpdate("CFBundleShortVersionString", version.ToString(), dict);
 
-            int bundleVersion = default(int);
+            var bundleVersion = default(int);
             var bundleVersionNode = dict?.Descendants("key")?.FirstOrDefault(x => x.Value == "CFBundleVersion");
 
-            RunIfKvpExists(bundleVersionNode, "string", (bundleVersionValueNode) =>
-            {
-                bundleVersion = decimal.TryParse(bundleVersionValueNode.Value, out decimal result) ? (int)result : 0;
-            });
+            RunIfKvpExists(bundleVersionNode, "string",
+                bundleVersionValueNode =>
+                {
+                    bundleVersion = decimal.TryParse(bundleVersionValueNode.Value, out var result) ? (int) result : 0;
+                });
 
             AddOrUpdate("CFBundleVersion", $"{++bundleVersion}", dict);
 
@@ -84,10 +86,7 @@ namespace SemanticVersioning.Models
             }
             else
             {
-                RunIfKvpExists(keyElement, "string", (valueNode) =>
-                {
-                    valueNode.Value = value;
-                });
+                RunIfKvpExists(keyElement, "string", valueNode => { valueNode.Value = value; });
             }
         }
     }

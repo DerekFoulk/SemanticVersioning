@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
@@ -32,11 +31,11 @@ namespace SemanticVersioning.Models
                 "FileVersion"
             };
 
-            foreach (string element in elements)
+            foreach (var element in elements)
             {
                 var value = xDocument?.Element("Project")?.Element("PropertyGroup")?.Element(element)?.Value;
 
-                if (String.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty(value))
                     continue;
 
                 var version = new Version(value);
@@ -60,7 +59,7 @@ namespace SemanticVersioning.Models
                 Indent = true
             };
 
-            using (XmlWriter xmlWriter = XmlWriter.Create(FileName, xmlWriterSettings))
+            using (var xmlWriter = XmlWriter.Create(FileName, xmlWriterSettings))
             {
                 xDocument?.Save(xmlWriter);
             }

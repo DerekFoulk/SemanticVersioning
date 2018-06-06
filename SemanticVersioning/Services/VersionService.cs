@@ -1,13 +1,16 @@
-﻿using SemanticVersioning.Extensions;
-using SemanticVersioning.Models;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using EnvDTE;
+using SemanticVersioning.Extensions;
+using Project = SemanticVersioning.Models.Project;
+using Version = SemanticVersioning.Models.Version;
 
 namespace SemanticVersioning.Services
 {
     internal sealed class VersionService
     {
-        private readonly EnvDTE.DTE _dte;
+        private readonly DTE _dte;
 
         private IEnumerable<Project> _projects;
 
@@ -21,7 +24,6 @@ namespace SemanticVersioning.Services
             var projects = new List<Project>();
 
             foreach (EnvDTE.Project project in _dte.Solution.Projects)
-            {
                 try
                 {
                     projects.Add(new Project(project));
@@ -29,7 +31,6 @@ namespace SemanticVersioning.Services
                 catch
                 {
                 }
-            }
 
             _projects = projects;
         }
@@ -38,7 +39,8 @@ namespace SemanticVersioning.Services
         {
             LoadProjects();
 
-            var versions = _projects.SelectMany(x => x.Files.Where(y => !y.Versions.IsNullOrEmpty()).SelectMany(y => y.Versions));
+            var versions = _projects.SelectMany(x =>
+                x.Files.Where(y => !y.Versions.IsNullOrEmpty()).SelectMany(y => y.Versions));
 
             var uniqueVersions = versions.GroupBy(x => new
             {
@@ -62,17 +64,13 @@ namespace SemanticVersioning.Services
         internal void SetVersions(Version version)
         {
             if (version.IsNullOrEmpty())
-                throw new System.ArgumentException();
+                throw new ArgumentException();
 
             LoadProjects();
 
-            foreach (Project project in _projects)
-            {
-                foreach (IFile file in project.Files)
-                {
-                    file.SetVersions(version);
-                }
-            }
+            foreach (var project in _projects)
+            foreach (var file in project.Files)
+                file.SetVersions(version);
         }
     }
 }
