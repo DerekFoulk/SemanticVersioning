@@ -39,24 +39,25 @@ namespace SemanticVersioning.Services
         {
             LoadProjects();
 
-            var versions = _projects.SelectMany(x =>
-                x.Files.Where(y => !y.Versions.IsNullOrEmpty()).SelectMany(y => y.Versions));
+            var versions = _projects
+                .SelectMany(x => x.Files.Where(y => !y.Versions.IsNullOrEmpty()).SelectMany(y => y.Versions));
 
-            var uniqueVersions = versions.GroupBy(x => new
-            {
-                x.Major,
-                x.Minor,
-                x.Patch,
-                x.Build
-            }).Select(x => x.FirstOrDefault());
+            var uniqueVersions = versions
+                .GroupBy(x => new
+                {
+                    x.Major,
+                    x.Minor,
+                    x.Patch,
+                    x.Build
+                })
+                .Select(x => x.FirstOrDefault());
 
-            var sortedVersions = uniqueVersions
+            var highestVersion = uniqueVersions
                 .OrderByDescending(x => x.Major)
                 .ThenByDescending(x => x.Minor)
                 .ThenByDescending(x => x.Patch)
-                .ThenByDescending(x => x.Build);
-
-            var highestVersion = sortedVersions.FirstOrDefault();
+                .ThenByDescending(x => x.Build)
+                .FirstOrDefault();
 
             return highestVersion ?? new Version("1.0.0");
         }
