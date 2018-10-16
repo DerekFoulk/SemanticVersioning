@@ -40,7 +40,10 @@ namespace SemanticVersioning.Services
             LoadProjects();
 
             var versions = _projects
-                .SelectMany(x => x.Files.Where(y => !y.Versions.IsNullOrEmpty()).SelectMany(y => y.Versions));
+                .SelectMany(x => x.Files
+                    .Where(y => !y.Versions.IsNullOrEmpty())
+                    .SelectMany(y => y.Versions)
+                );
 
             var uniqueVersions = versions
                 .GroupBy(x => new
@@ -48,7 +51,8 @@ namespace SemanticVersioning.Services
                     x.Major,
                     x.Minor,
                     x.Patch,
-                    x.Build
+                    x.Build,
+                    x.Suffix
                 })
                 .Select(x => x.FirstOrDefault());
 
@@ -57,6 +61,7 @@ namespace SemanticVersioning.Services
                 .ThenByDescending(x => x.Minor)
                 .ThenByDescending(x => x.Patch)
                 .ThenByDescending(x => x.Build)
+                .ThenBy(x => x.Suffix)
                 .FirstOrDefault();
 
             return highestVersion ?? new Version("1.0.0");

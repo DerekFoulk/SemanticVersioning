@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using SemanticVersioning.Extensions;
 
 namespace SemanticVersioning.Models
 {
@@ -10,13 +11,14 @@ namespace SemanticVersioning.Models
 
         public Version(string version)
         {
-            if (TryParse(version, out var result))
-            {
-                Major = result.Major;
-                Minor = result.Minor;
-                Patch = result.Patch;
-                Build = result.Build;
-            }
+            if (!TryParse(version, out var result))
+                return;
+
+            Major = result.Major;
+            Minor = result.Minor;
+            Patch = result.Patch;
+            Build = result.Build;
+            Suffix = result.Suffix;
         }
 
         public int Major { get; set; }
@@ -27,6 +29,8 @@ namespace SemanticVersioning.Models
 
         public int? Build { get; set; }
 
+        public string Suffix { get; set; }
+
         public bool TryParse(string s, out Version result)
         {
             result = null;
@@ -36,10 +40,10 @@ namespace SemanticVersioning.Models
 
             var input = s.Trim();
 
-            if (!Regex.IsMatch(input, @"^(\d+|\d+(\.\d+)+)$"))
+            if (!Regex.IsMatch(input, @"^\d+(\.\d+){0,3}(-\w+(\.\w+)*)*$"))
                 return false;
 
-            var versions = input.Split('.');
+            var versions = input.Before('-').Split('.');
 
             result = new Version
             {
@@ -49,6 +53,11 @@ namespace SemanticVersioning.Models
                 Build = versions.Length >= 4 ? int.Parse(versions[3]) : default(int?)
             };
 
+            var suffix = input.After('-');
+
+            if (!string.IsNullOrWhiteSpace(suffix))
+                result.Suffix = suffix;
+
             return true;
         }
 
@@ -57,13 +66,20 @@ namespace SemanticVersioning.Models
             var version = $"{Major}";
 
             if (Minor != null)
+            {
                 version += $".{Minor}";
 
-            if (Patch != null)
-                version += $".{Patch}";
+                if (Patch != null)
+                {
+                    version += $".{Patch}";
 
-            if (Build != null)
-                version += $".{Build}";
+                    if (Build != null)
+                        version += $".{Build}";
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(Suffix))
+                version += $"-{Suffix}";
 
             return version;
         }
