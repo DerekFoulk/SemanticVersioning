@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
+using Microsoft.VisualStudio.Shell;
 using SemanticVersioning.Extensions;
 using Project = SemanticVersioning.Models.Project;
 using Version = SemanticVersioning.Models.Version;
@@ -21,6 +22,8 @@ namespace SemanticVersioning.Services
 
         private void LoadProjects()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var projects = new List<Project>();
 
             foreach (EnvDTE.Project project in _dte.Solution.Projects)
