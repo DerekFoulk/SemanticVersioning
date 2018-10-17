@@ -40,12 +40,14 @@ namespace SemanticVersioning.Services
         {
             LoadProjects();
 
+            // Get versions from files
             var versions = _projects
                 .SelectMany(x => x.Files
                     .Where(y => !y.Versions.IsNullOrEmpty())
                     .SelectMany(y => y.Versions)
                 );
 
+            // Get unique versions
             var uniqueVersions = versions
                 .GroupBy(x => new
                 {
@@ -57,13 +59,15 @@ namespace SemanticVersioning.Services
                 })
                 .Select(x => x.FirstOrDefault());
 
-            var highestVersion = uniqueVersions
-                .OrderByDescending(x => x?.Major)
-                .ThenByDescending(x => x?.Minor)
-                .ThenByDescending(x => x?.Patch)
-                .ThenByDescending(x => x?.Build)
-                .ThenBy(x => x?.Suffix)
-                .FirstOrDefault();
+            // Get highest version (ignoring zeros during sorting)
+            var sortedVersions = uniqueVersions
+                .OrderByDescending(x => x?.Major == 0 ? null : x?.Major)
+                .ThenByDescending(x => x?.Minor == 0 ? null : x?.Minor)
+                .ThenByDescending(x => x?.Patch == 0 ? null : x?.Patch)
+                .ThenByDescending(x => x?.Build == 0 ? null : x?.Build)
+                .ThenByDescending(x => x.Suffix);
+
+            var highestVersion = sortedVersions.FirstOrDefault();
 
             return highestVersion ?? new Version("1.0.0");
         }
