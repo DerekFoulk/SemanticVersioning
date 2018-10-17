@@ -5,7 +5,7 @@ namespace SemanticVersioning.Models
 {
     public class Version
     {
-        public Version()
+        private Version()
         {
         }
 
@@ -21,6 +21,7 @@ namespace SemanticVersioning.Models
             Suffix = result.Suffix;
         }
 
+        // ReSharper disable MemberCanBePrivate.Global
         public int Major { get; set; }
 
         public int? Minor { get; set; }
@@ -30,8 +31,9 @@ namespace SemanticVersioning.Models
         public int? Build { get; set; }
 
         public string Suffix { get; set; }
+        // ReSharper restore MemberCanBePrivate.Global
 
-        public bool TryParse(string s, out Version result)
+        private static bool TryParse(string s, out Version result)
         {
             result = null;
 
@@ -82,11 +84,6 @@ namespace SemanticVersioning.Models
                 version += $"-{Suffix}";
 
             return version;
-        }
-
-        public string ToSemanticVersionString()
-        {
-            return $"{Major}.{Minor ?? 0}.{Patch ?? 0}";
         }
 
         public string ToAssemblyVersionString()

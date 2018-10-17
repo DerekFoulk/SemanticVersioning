@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using SemanticVersioning.Models;
+// ReSharper disable UnusedMember.Global
 
 namespace SemanticVersioning.Extensions
 {
@@ -12,11 +13,11 @@ namespace SemanticVersioning.Extensions
 
             var properties = version.GetType().GetProperties();
 
-            var targetProperties = properties.Where(x => x.GetValue(version) is int?);
+            var targetProperties = properties.Where(x => x.GetValue(version) is int);
 
             var values = targetProperties.Select(x => x.GetValue(version) as int?);
 
-            var isEmpty = !values.Any(x => x != null);
+            var isEmpty = values.All(x => x == null);
 
             return isEmpty;
         }

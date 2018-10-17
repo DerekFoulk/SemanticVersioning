@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+// ReSharper disable UnusedMember.Global
 
 namespace SemanticVersioning.Extensions
 {

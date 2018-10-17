@@ -24,7 +24,7 @@ namespace SemanticVersioning.Models
             var xDocument = XDocument.Load(FileName);
             XNamespace xNamespace = "http://schemas.android.com/apk/res/android";
 
-            var version = xDocument?.Element("manifest")?.Attribute(xNamespace + "versionName")?.Value;
+            var version = xDocument.Element("manifest")?.Attribute(xNamespace + "versionName")?.Value;
             versions.Add(new Version(version));
 
             return versions.Any() ? versions : null;
@@ -35,13 +35,13 @@ namespace SemanticVersioning.Models
             var xDocument = XDocument.Load(FileName);
             XNamespace xNamespace = "http://schemas.android.com/apk/res/android";
 
-            xDocument?.Element("manifest")?.SetAttributeValue(xNamespace + "versionName", version.ToString());
+            xDocument.Element("manifest")?.SetAttributeValue(xNamespace + "versionName", version.ToString());
 
-            var versionCodeValue = xDocument?.Element("manifest")?.Attribute(xNamespace + "versionCode")?.Value;
+            var versionCodeValue = xDocument.Element("manifest")?.Attribute(xNamespace + "versionCode")?.Value;
             var versionCode = decimal.TryParse(versionCodeValue, out var result) ? (int) result : 0;
-            xDocument?.Element("manifest")?.SetAttributeValue(xNamespace + "versionCode", ++versionCode);
+            xDocument.Element("manifest")?.SetAttributeValue(xNamespace + "versionCode", ++versionCode);
 
-            xDocument?.Save(FileName);
+            xDocument.Save(FileName);
         }
     }
 }

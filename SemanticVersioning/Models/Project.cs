@@ -9,14 +9,10 @@ namespace SemanticVersioning.Models
 {
     public class Project
     {
-        private readonly EnvDTE.Project _project;
-
         public Project(EnvDTE.Project project)
         {
             if (string.IsNullOrWhiteSpace(project.FileName))
-                throw new ArgumentException("Project does not exist.", "project");
-
-            _project = project;
+                throw new ArgumentException("Project does not exist.", nameof(project));
 
             FileName = project.FileName;
 
@@ -25,20 +21,19 @@ namespace SemanticVersioning.Models
             Files = GetFiles();
         }
 
-        public string FileName { get; set; }
+        private string FileName { get; }
 
-        public ProjectType Type { get; set; }
+        private ProjectType Type { get; }
 
-        public IEnumerable<IFile> Files { get; set; }
+        public IEnumerable<IFile> Files { get; }
 
         private ProjectType GetProjectType()
         {
-            var projectType = default(ProjectType);
+            ProjectType projectType;
 
             var xDocument = XDocument.Load(FileName);
 
-            var targetFramework = xDocument?
-                .Element("Project")?
+            var targetFramework = xDocument.Element("Project")?
                 .Element("PropertyGroup")?
                 .Element("TargetFramework")?.Value;
 
@@ -51,10 +46,9 @@ namespace SemanticVersioning.Models
             {
                 XNamespace xNamespace = "http://schemas.microsoft.com/developer/msbuild/2003";
 
-                var projectTypeGuids = xDocument?
-                    .Elements(xNamespace + "Project")?
-                    .Elements(xNamespace + "PropertyGroup")?
-                    .Elements(xNamespace + "ProjectTypeGuids")?
+                var projectTypeGuids = xDocument.Elements(xNamespace + "Project")
+                    .Elements(xNamespace + "PropertyGroup")
+                    .Elements(xNamespace + "ProjectTypeGuids")
                     .Select(x => x.Value)
                     .SelectMany(x => x.Replace("{", string.Empty).Replace("}", string.Empty).Split(';'));
 
@@ -65,7 +59,7 @@ namespace SemanticVersioning.Models
             return projectType;
         }
 
-        private void TryAddFiles(List<IFile> files, string projectDirectory, Type type, string searchPattern = "*")
+        private static void TryAddFiles(ICollection<IFile> files, string projectDirectory, Type type, string searchPattern = "*")
         {
             var targetFiles = Directory.GetFiles(projectDirectory, searchPattern, SearchOption.AllDirectories)
                 .Where(x => !x.Contains(@"\obj\") && !x.Contains(@"\bin\"));
@@ -113,6 +107,9 @@ namespace SemanticVersioning.Models
                     TryAddFiles(files, projectDirectory, typeof(PackageFile), "*Package.appxmanifest");
                     break;
 
+                case ProjectType.Other:
+                    TryAddFiles(files, projectDirectory, typeof(AssemblyInfoFile), "*AssemblyInfo.cs");
+                    break;
                 default:
                     TryAddFiles(files, projectDirectory, typeof(AssemblyInfoFile), "*AssemblyInfo.cs");
                     break;

@@ -16,7 +16,7 @@ namespace SemanticVersioning.Services
 
         internal VersionService()
         {
-            _dte = DteService.Instance.DTE;
+            _dte = DteService.Instance.Dte;
         }
 
         private void LoadProjects()
@@ -30,6 +30,7 @@ namespace SemanticVersioning.Services
                 }
                 catch
                 {
+                    // ignored
                 }
 
             _projects = projects;
@@ -57,11 +58,11 @@ namespace SemanticVersioning.Services
                 .Select(x => x.FirstOrDefault());
 
             var highestVersion = uniqueVersions
-                .OrderByDescending(x => x.Major)
-                .ThenByDescending(x => x.Minor)
-                .ThenByDescending(x => x.Patch)
-                .ThenByDescending(x => x.Build)
-                .ThenBy(x => x.Suffix)
+                .OrderByDescending(x => x?.Major)
+                .ThenByDescending(x => x?.Minor)
+                .ThenByDescending(x => x?.Patch)
+                .ThenByDescending(x => x?.Build)
+                .ThenBy(x => x?.Suffix)
                 .FirstOrDefault();
 
             return highestVersion ?? new Version("1.0.0");

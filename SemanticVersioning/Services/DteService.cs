@@ -10,12 +10,12 @@ namespace SemanticVersioning.Services
         {
             var serviceProvider = package as IServiceProvider ?? throw new ArgumentNullException();
 
-            DTE = (DTE) serviceProvider.GetService(typeof(DTE));
+            Dte = (DTE) serviceProvider.GetService(typeof(DTE));
         }
 
         internal static DteService Instance { get; private set; }
 
-        internal DTE DTE { get; }
+        internal DTE Dte { get; }
 
         internal static void Initialize(Package package)
         {
