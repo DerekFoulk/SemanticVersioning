@@ -14,12 +14,12 @@ namespace SemanticVersioning
         /// <summary>
         ///     Command ID.
         /// </summary>
-        public const int CommandId = 0x0100;
+        private const int CommandId = 0x0100;
 
         /// <summary>
         ///     Command menu group (command set GUID).
         /// </summary>
-        public static readonly Guid CommandSet = new Guid("36b8c66b-53b4-4341-b40c-e9a28ea2c2cc");
+        private static readonly Guid CommandSet = new Guid("36b8c66b-53b4-4341-b40c-e9a28ea2c2cc");
 
         /// <summary>
         ///     VS Package that provides this command, not null.
