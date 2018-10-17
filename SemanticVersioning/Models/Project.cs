@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.VisualStudio.Shell;
 using SemanticVersioning.Extensions;
 
 namespace SemanticVersioning.Models
@@ -11,6 +12,8 @@ namespace SemanticVersioning.Models
     {
         public Project(EnvDTE.Project project)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             if (string.IsNullOrWhiteSpace(project.FileName))
                 throw new ArgumentException("Project does not exist.", nameof(project));
 

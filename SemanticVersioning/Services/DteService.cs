@@ -8,6 +8,8 @@ namespace SemanticVersioning.Services
     {
         private DteService(Package package)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var serviceProvider = package as IServiceProvider ?? throw new ArgumentNullException();
 
             Dte = (DTE) serviceProvider.GetService(typeof(DTE));
