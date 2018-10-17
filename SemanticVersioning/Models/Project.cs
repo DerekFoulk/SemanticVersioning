@@ -59,7 +59,8 @@ namespace SemanticVersioning.Models
             return projectType;
         }
 
-        private static void TryAddFiles(ICollection<IFile> files, string projectDirectory, Type type, string searchPattern = "*")
+        private static void TryAddFiles(ICollection<IFile> files, string projectDirectory, Type type,
+            string searchPattern = "*")
         {
             var targetFiles = Directory.GetFiles(projectDirectory, searchPattern, SearchOption.AllDirectories)
                 .Where(x => !x.Contains(@"\obj\") && !x.Contains(@"\bin\"));

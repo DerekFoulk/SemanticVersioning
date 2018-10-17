@@ -51,7 +51,7 @@ namespace SemanticVersioning
         protected override void Dispose(bool disposing)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            
+
             // Release the RDT cookie.
             _rdt.UnadviseRunningDocTableEvents(_rdtCookie);
 

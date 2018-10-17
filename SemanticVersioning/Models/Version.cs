@@ -21,7 +21,6 @@ namespace SemanticVersioning.Models
             Suffix = result.Suffix;
         }
 
-        // ReSharper disable MemberCanBePrivate.Global
         public int Major { get; set; }
 
         public int? Minor { get; set; }
@@ -31,7 +30,6 @@ namespace SemanticVersioning.Models
         public int? Build { get; set; }
 
         public string Suffix { get; set; }
-        // ReSharper restore MemberCanBePrivate.Global
 
         private static bool TryParse(string s, out Version result)
         {

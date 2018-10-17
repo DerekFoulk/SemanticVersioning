@@ -75,7 +75,7 @@ namespace SemanticVersioning.Views
 
         private static void TextBox_SelectAll(object sender)
         {
-            var textBox = (TextBox)sender;
+            var textBox = (TextBox) sender;
 
             textBox.SelectAll();
         }
@@ -86,7 +86,7 @@ namespace SemanticVersioning.Views
                 return;
 
             // Update binding source (necessary because the binding source is not updated until the TextBox loses focus by default)
-            var textBox = (TextBox)sender;
+            var textBox = (TextBox) sender;
             var bindingExpression = BindingOperations.GetBindingExpression(textBox, TextBox.TextProperty);
             bindingExpression?.UpdateSource();
 
