@@ -33,7 +33,7 @@ namespace SemanticVersioning.Models
 
             foreach (var element in elements)
             {
-                var value = xDocument?.Element("Project")?.Element("PropertyGroup")?.Element(element)?.Value;
+                var value = xDocument.Element("Project")?.Element("PropertyGroup")?.Element(element)?.Value;
 
                 if (string.IsNullOrEmpty(value))
                     continue;
@@ -49,9 +49,9 @@ namespace SemanticVersioning.Models
         {
             var xDocument = XDocument.Load(FileName);
 
-            xDocument?.Element("Project")?.Element("PropertyGroup")?.SetElementValue("Version", version.ToString());
-            xDocument?.Element("Project")?.Element("PropertyGroup")?.SetElementValue("AssemblyVersion", null);
-            xDocument?.Element("Project")?.Element("PropertyGroup")?.SetElementValue("FileVersion", null);
+            xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("Version", version.ToString());
+            xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("AssemblyVersion", null);
+            xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("FileVersion", null);
 
             var xmlWriterSettings = new XmlWriterSettings
             {
@@ -61,7 +61,7 @@ namespace SemanticVersioning.Models
 
             using (var xmlWriter = XmlWriter.Create(FileName, xmlWriterSettings))
             {
-                xDocument?.Save(xmlWriter);
+                xDocument.Save(xmlWriter);
             }
         }
     }

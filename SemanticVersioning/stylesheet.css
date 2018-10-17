@@ -35,15 +35,6 @@ h1, h2, h3, h4, h5, h6 { margin: 0; }
     position: relative;
 }
 
-#hangcloud {
-    background: url("../images/bannerart03.png");
-    height: 160px;
-    position: absolute;
-    right: -30px;
-    top: 0;
-    width: 190px;
-}
-
 h1, h2 {
     font-family: "Segoe UI Light", "Segoe UI", Helvetica, Arial, sans-serif;
     line-height: 1;

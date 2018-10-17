@@ -5,7 +5,7 @@ namespace SemanticVersioning.Models
 {
     public class Version
     {
-        public Version()
+        private Version()
         {
         }
 
@@ -31,7 +31,7 @@ namespace SemanticVersioning.Models
 
         public string Suffix { get; set; }
 
-        public bool TryParse(string s, out Version result)
+        private static bool TryParse(string s, out Version result)
         {
             result = null;
 
@@ -82,11 +82,6 @@ namespace SemanticVersioning.Models
                 version += $"-{Suffix}";
 
             return version;
-        }
-
-        public string ToSemanticVersionString()
-        {
-            return $"{Major}.{Minor ?? 0}.{Patch ?? 0}";
         }
 
         public string ToAssemblyVersionString()

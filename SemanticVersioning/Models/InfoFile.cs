@@ -24,8 +24,8 @@ namespace SemanticVersioning.Models
 
             var xDocument = XDocument.Load(FileName);
 
-            var keyNode = xDocument?.Element("plist")?.Element("dict")?.Descendants("key")
-                ?.FirstOrDefault(x => x.Value == "CFBundleShortVersionString");
+            var keyNode = xDocument.Element("plist")?.Element("dict")?.Descendants("key")
+                .FirstOrDefault(x => x.Value == "CFBundleShortVersionString");
             RunIfKvpExists(keyNode, "string", valueNode =>
             {
                 var version = valueNode.Value;
@@ -39,14 +39,15 @@ namespace SemanticVersioning.Models
         {
             var xDocument = XDocument.Load(FileName);
 
-            xDocument.DocumentType.InternalSubset = null;
+            if (xDocument.DocumentType != null)
+                xDocument.DocumentType.InternalSubset = null;
 
-            var dict = xDocument?.Element("plist")?.Element("dict");
+            var dict = xDocument.Element("plist")?.Element("dict");
 
             AddOrUpdate("CFBundleShortVersionString", version.ToString(), dict);
 
             var bundleVersion = default(int);
-            var bundleVersionNode = dict?.Descendants("key")?.FirstOrDefault(x => x.Value == "CFBundleVersion");
+            var bundleVersionNode = dict?.Descendants("key").FirstOrDefault(x => x.Value == "CFBundleVersion");
 
             RunIfKvpExists(bundleVersionNode, "string",
                 bundleVersionValueNode =>
@@ -56,18 +57,18 @@ namespace SemanticVersioning.Models
 
             AddOrUpdate("CFBundleVersion", $"{++bundleVersion}", dict);
 
-            xDocument?.Save(FileName);
+            xDocument.Save(FileName);
         }
 
-        private void RunIfKvpExists(XElement keyNode, string valueNodeName, Action<XElement> action)
+        private static void RunIfKvpExists(XNode keyNode, string valueNodeName, Action<XElement> action)
         {
             if (keyNode?.NextNode is XElement valueNode && valueNode.Name == valueNodeName)
                 action.Invoke(valueNode);
         }
 
-        private void AddOrUpdate(string key, string value, XElement dict)
+        private static void AddOrUpdate(string key, string value, XContainer dict)
         {
-            var keyElement = dict?.Descendants("key")?.FirstOrDefault(x => x.Value == key);
+            var keyElement = dict?.Descendants("key").FirstOrDefault(x => x.Value == key);
 
             if (keyElement == default(XElement))
             {

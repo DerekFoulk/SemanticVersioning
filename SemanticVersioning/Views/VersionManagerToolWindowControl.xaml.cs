@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,13 +8,15 @@ using SemanticVersioning.ViewModels;
 
 namespace SemanticVersioning.Views
 {
+    /// <inheritdoc cref="UserControl" />
     /// <summary>
     ///     Interaction logic for VersionManagerToolWindowControl.
     /// </summary>
-    public partial class VersionManagerToolWindowControl : UserControl
+    public partial class VersionManagerToolWindowControl
     {
         private readonly VersionManagerToolWindowViewModel _versionManagerToolWindowViewModel;
 
+        /// <inheritdoc />
         /// <summary>
         ///     Initializes a new instance of the <see cref="VersionManagerToolWindowControl" /> class.
         /// </summary>
@@ -72,24 +73,24 @@ namespace SemanticVersioning.Views
             TextBox_SelectAll(sender);
         }
 
-        private void TextBox_SelectAll(object sender)
+        private static void TextBox_SelectAll(object sender)
         {
-            var textBox = sender as TextBox;
+            var textBox = (TextBox) sender;
 
             textBox.SelectAll();
         }
 
         private void TextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Return)
-            {
-                // Update binding source (necessary because the binding source is not updated until the TextBox loses focus by default)
-                var textBox = sender as TextBox;
-                var bindingExpression = BindingOperations.GetBindingExpression(textBox, TextBox.TextProperty);
-                bindingExpression?.UpdateSource();
+            if (e.Key != Key.Return)
+                return;
 
-                _versionManagerToolWindowViewModel.Update();
-            }
+            // Update binding source (necessary because the binding source is not updated until the TextBox loses focus by default)
+            var textBox = (TextBox) sender;
+            var bindingExpression = BindingOperations.GetBindingExpression(textBox, TextBox.TextProperty);
+            bindingExpression?.UpdateSource();
+
+            _versionManagerToolWindowViewModel.Update();
         }
     }
 }

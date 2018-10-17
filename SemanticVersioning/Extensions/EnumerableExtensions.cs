@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+// ReSharper disable UnusedMember.Global
+
 namespace SemanticVersioning.Extensions
 {
     public static class EnumerableExtensions

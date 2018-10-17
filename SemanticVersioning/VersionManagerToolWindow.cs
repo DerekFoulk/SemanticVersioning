@@ -7,6 +7,7 @@ using SemanticVersioning.Views;
 
 namespace SemanticVersioning
 {
+    /// <inheritdoc cref="ToolWindowPane" />
     /// <summary>
     ///     This class implements the tool window exposed by this package and hosts a user control.
     /// </summary>
@@ -19,10 +20,10 @@ namespace SemanticVersioning
     ///     </para>
     /// </remarks>
     [Guid("f4199493-3695-4a7e-9410-1cb07e49f120")]
-    public class VersionManagerToolWindow : ToolWindowPane, IVsRunningDocTableEvents
+    public sealed class VersionManagerToolWindow : ToolWindowPane, IVsRunningDocTableEvents
     {
-        private IVsRunningDocumentTable rdt;
-        private uint rdtCookie;
+        private IVsRunningDocumentTable _rdt;
+        private uint _rdtCookie;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="VersionManagerToolWindow" /> class.
@@ -39,16 +40,20 @@ namespace SemanticVersioning
 
         protected override void Initialize()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             base.Initialize();
 
-            rdt = (IVsRunningDocumentTable) GetService(typeof(SVsRunningDocumentTable));
-            rdt.AdviseRunningDocTableEvents(this, out rdtCookie);
+            _rdt = (IVsRunningDocumentTable) GetService(typeof(SVsRunningDocumentTable));
+            _rdt.AdviseRunningDocTableEvents(this, out _rdtCookie);
         }
 
         protected override void Dispose(bool disposing)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             // Release the RDT cookie.
-            rdt.UnadviseRunningDocTableEvents(rdtCookie);
+            _rdt.UnadviseRunningDocTableEvents(_rdtCookie);
 
             base.Dispose(disposing);
         }
@@ -59,13 +64,13 @@ namespace SemanticVersioning
 
         // See https://docs.microsoft.com/en-us/visualstudio/extensibility/subscribing-to-an-event
 
-        public int OnAfterFirstDocumentLock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining,
+        public int OnAfterFirstDocumentLock(uint docCookie, uint dwRdtLockType, uint dwReadLocksRemaining,
             uint dwEditLocksRemaining)
         {
             return VSConstants.S_OK;
         }
 
-        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining,
+        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRdtLockType, uint dwReadLocksRemaining,
             uint dwEditLocksRemaining)
         {
             return VSConstants.S_OK;
@@ -73,15 +78,17 @@ namespace SemanticVersioning
 
         public int OnAfterSave(uint docCookie)
         {
-            var doc = rdt.GetDocumentInfo(
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            _rdt.GetDocumentInfo(
                 docCookie,
-                out var pgrfRDTFlags,
-                out var pdwReadLocks,
-                out var pdwEditLocks,
+                out _,
+                out _,
+                out _,
                 out var pbstrMkDocument,
-                out var ppHier,
-                out var pitemid,
-                out var ppunkDocData
+                out _,
+                out _,
+                out _
             );
 
             var documentSavedEventArgs = new DocumentSavedEventArgs

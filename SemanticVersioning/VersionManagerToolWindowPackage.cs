@@ -35,7 +35,7 @@ namespace SemanticVersioning
         /// <summary>
         ///     VersionManagerToolWindowPackage GUID string.
         /// </summary>
-        public const string PackageGuidString = "f77b7e42-9166-4bcb-98d3-6e3d5b23a178";
+        private const string PackageGuidString = "f77b7e42-9166-4bcb-98d3-6e3d5b23a178";
 
         #region Package Members
 

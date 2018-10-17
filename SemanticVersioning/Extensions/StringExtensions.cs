@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 
+// ReSharper disable UnusedMember.Global
+
 namespace SemanticVersioning.Extensions
 {
     public static class StringExtensions
@@ -12,28 +14,28 @@ namespace SemanticVersioning.Extensions
 
         public static string After(this string s, char value)
         {
-            var arr = s.Split(new[] { value }, StringSplitOptions.None);
+            var arr = s.Split(new[] {value}, StringSplitOptions.None);
 
             return arr.Length >= 2 ? arr.LastOrDefault() : null;
         }
 
         public static string After(this string s, string value)
         {
-            var arr = s.Split(new[] { value }, StringSplitOptions.None);
+            var arr = s.Split(new[] {value}, StringSplitOptions.None);
 
             return arr.Length >= 2 ? arr.LastOrDefault() : null;
         }
 
         public static string Before(this string s, char value)
         {
-            var arr = s.Split(new[] { value }, StringSplitOptions.None);
+            var arr = s.Split(new[] {value}, StringSplitOptions.None);
 
             return arr.FirstOrDefault();
         }
 
         public static string Before(this string s, string value)
         {
-            var arr = s.Split(new[] { value }, StringSplitOptions.None);
+            var arr = s.Split(new[] {value}, StringSplitOptions.None);
 
             return arr.FirstOrDefault();
         }

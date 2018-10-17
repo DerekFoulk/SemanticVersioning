@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+// ReSharper disable UnusedMemberInSuper.Global
+
 namespace SemanticVersioning.Models
 {
     public interface IFile
