@@ -25,7 +25,15 @@ namespace SemanticVersioning.Models
             XNamespace xNamespace = "http://schemas.android.com/apk/res/android";
 
             var version = xDocument.Element("manifest")?.Attribute(xNamespace + "versionName")?.Value;
-            versions.Add(new Version(version));
+
+            try
+            {
+                versions.Add(new Version(version));
+            }
+            catch
+            {
+                // ignored
+            }
 
             return versions.Any() ? versions : null;
         }

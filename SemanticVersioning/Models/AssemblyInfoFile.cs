@@ -36,7 +36,15 @@ namespace SemanticVersioning.Models
                     continue;
 
                 var version = Regex.Match(match.Value, RegexPatterns.VersionNumbers).Value;
-                versions.Add(new Version(version));
+
+                try
+                {
+                    versions.Add(new Version(version));
+                }
+                catch
+                {
+                    // ignored
+                }
             }
 
             return versions.Any() ? versions : null;

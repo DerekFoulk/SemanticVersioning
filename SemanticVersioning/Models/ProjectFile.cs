@@ -33,13 +33,16 @@ namespace SemanticVersioning.Models
 
             foreach (var element in elements)
             {
-                var value = xDocument.Element("Project")?.Element("PropertyGroup")?.Element(element)?.Value;
+                var version = xDocument.Element("Project")?.Element("PropertyGroup")?.Element(element)?.Value;
 
-                if (string.IsNullOrEmpty(value))
-                    continue;
-
-                var version = new Version(value);
-                versions.Add(version);
+                try
+                {
+                    versions.Add(new Version(version));
+                }
+                catch
+                {
+                    // ignored
+                }
             }
 
             return versions.Any() ? versions : null;

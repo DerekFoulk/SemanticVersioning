@@ -29,7 +29,15 @@ namespace SemanticVersioning.Models
             RunIfKvpExists(keyNode, "string", valueNode =>
             {
                 var version = valueNode.Value;
-                versions.Add(new Version(version));
+
+                try
+                {
+                    versions.Add(new Version(version));
+                }
+                catch
+                {
+                    // ignored
+                }
             });
 
             return versions.Any() ? versions : null;

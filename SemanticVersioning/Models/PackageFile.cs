@@ -27,7 +27,15 @@ namespace SemanticVersioning.Models
 
             var version = xDocument.Element(xNamespace + "Package")?.Element(xNamespace + "Identity")
                 ?.Attribute("Version")?.Value;
-            versions.Add(new Version(version));
+
+            try
+            {
+                versions.Add(new Version(version));
+            }
+            catch
+            {
+                // ignored
+            }
 
             return versions.Any() ? versions : null;
         }
