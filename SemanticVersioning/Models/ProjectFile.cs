@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
@@ -52,8 +53,15 @@ namespace SemanticVersioning.Models
         {
             var xDocument = XDocument.Load(FileName);
 
-            xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("Version", version.ToVersionString());
-            xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("AssemblyVersion", null);
+            xDocument.Element("Project")?.Element("PropertyGroup")
+                ?.SetElementValue("Version", version.ToVersionString());
+
+            var build = version.Build;
+            xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("AssemblyVersion",
+                !string.IsNullOrWhiteSpace(build) && build.Equals("*", StringComparison.Ordinal)
+                    ? version.ToAssemblyVersionString()
+                    : null);
+
             xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("FileVersion", null);
 
             var xmlWriterSettings = new XmlWriterSettings
