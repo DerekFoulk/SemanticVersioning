@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
@@ -33,13 +34,16 @@ namespace SemanticVersioning.Models
 
             foreach (var element in elements)
             {
-                var value = xDocument.Element("Project")?.Element("PropertyGroup")?.Element(element)?.Value;
+                var version = xDocument.Element("Project")?.Element("PropertyGroup")?.Element(element)?.Value;
 
-                if (string.IsNullOrEmpty(value))
-                    continue;
-
-                var version = new Version(value);
-                versions.Add(version);
+                try
+                {
+                    versions.Add(new Version(version));
+                }
+                catch
+                {
+                    // ignored
+                }
             }
 
             return versions.Any() ? versions : null;
@@ -49,8 +53,15 @@ namespace SemanticVersioning.Models
         {
             var xDocument = XDocument.Load(FileName);
 
-            xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("Version", version.ToString());
-            xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("AssemblyVersion", null);
+            xDocument.Element("Project")?.Element("PropertyGroup")
+                ?.SetElementValue("Version", version.ToVersionString());
+
+            var build = version.Build;
+            xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("AssemblyVersion",
+                !string.IsNullOrWhiteSpace(build) && build.Equals("*", StringComparison.Ordinal)
+                    ? version.ToAssemblyVersionString()
+                    : null);
+
             xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("FileVersion", null);
 
             var xmlWriterSettings = new XmlWriterSettings

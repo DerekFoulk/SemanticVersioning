@@ -67,7 +67,7 @@ namespace SemanticVersioning.Services
                 .OrderByDescending(x => x?.Major == 0 ? null : x?.Major)
                 .ThenByDescending(x => x?.Minor == 0 ? null : x?.Minor)
                 .ThenByDescending(x => x?.Patch == 0 ? null : x?.Patch)
-                .ThenByDescending(x => x?.Build == 0 ? null : x?.Build)
+                .ThenByDescending(x => x?.Build == "0" ? null : x?.Build)
                 .ThenByDescending(x => x.Suffix);
 
             var highestVersion = sortedVersions.FirstOrDefault();

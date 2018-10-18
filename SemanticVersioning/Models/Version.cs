@@ -5,7 +5,7 @@ namespace SemanticVersioning.Models
 {
     public class Version
     {
-        private Version()
+        public Version()
         {
         }
 
@@ -27,11 +27,11 @@ namespace SemanticVersioning.Models
 
         public int? Patch { get; set; }
 
-        public int? Build { get; set; }
+        public string Build { get; set; }
 
         public string Suffix { get; set; }
 
-        private static bool TryParse(string s, out Version result)
+        public static bool TryParse(string s, out Version result)
         {
             result = null;
 
@@ -40,7 +40,7 @@ namespace SemanticVersioning.Models
 
             var input = s.Trim();
 
-            if (!Regex.IsMatch(input, @"^\d+(\.\d+){0,3}(-\w+(\.\w+)*)*$"))
+            if (!Regex.IsMatch(input, @"^\d+(\.\d+){0,2}(\.(\d|\*)+)?(-\w+(\.\w+)*)*$"))
                 return false;
 
             var versions = input.Before('-').Split('.');
@@ -50,7 +50,7 @@ namespace SemanticVersioning.Models
                 Major = versions.Length >= 1 ? int.Parse(versions[0]) : default(int),
                 Minor = versions.Length >= 2 ? int.Parse(versions[1]) : default(int?),
                 Patch = versions.Length >= 3 ? int.Parse(versions[2]) : default(int?),
-                Build = versions.Length >= 4 ? int.Parse(versions[3]) : default(int?)
+                Build = versions.Length >= 4 ? versions[3] : default(string)
             };
 
             var suffix = input.After('-');
@@ -84,9 +84,37 @@ namespace SemanticVersioning.Models
             return version;
         }
 
-        public string ToAssemblyVersionString()
+        public string ToVersionString()
         {
-            return $"{Major}.{Minor ?? 0}.{Patch ?? 0}.{Build ?? 0}";
+            var version = $"{Major}";
+
+            if (Minor != null)
+            {
+                version += $".{Minor}";
+
+                if (Patch != null)
+                {
+                    version += $".{Patch}";
+
+                    if (Build.IsNumber())
+                        version += $".{Build}";
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(Suffix))
+                version += $"-{Suffix}";
+
+            return version;
+        }
+
+        public string ToAssemblyVersionString(bool allowWildcard = true)
+        {
+            var build = !string.IsNullOrWhiteSpace(Build) ? Build : "0";
+
+            if (!allowWildcard)
+                build = build.IsNumber() ? build : "0";
+
+            return $"{Major}.{Minor ?? 0}.{Patch ?? 0}.{build}";
         }
     }
 }

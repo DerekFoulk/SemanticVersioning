@@ -29,7 +29,15 @@ namespace SemanticVersioning.Models
             RunIfKvpExists(keyNode, "string", valueNode =>
             {
                 var version = valueNode.Value;
-                versions.Add(new Version(version));
+
+                try
+                {
+                    versions.Add(new Version(version));
+                }
+                catch
+                {
+                    // ignored
+                }
             });
 
             return versions.Any() ? versions : null;
@@ -44,7 +52,7 @@ namespace SemanticVersioning.Models
 
             var dict = xDocument.Element("plist")?.Element("dict");
 
-            AddOrUpdate("CFBundleShortVersionString", version.ToString(), dict);
+            AddOrUpdate("CFBundleShortVersionString", version.ToVersionString(), dict);
 
             var bundleVersion = default(int);
             var bundleVersionNode = dict?.Descendants("key").FirstOrDefault(x => x.Value == "CFBundleVersion");

@@ -27,7 +27,15 @@ namespace SemanticVersioning.Models
 
             var version = xDocument.Element(xNamespace + "Package")?.Element(xNamespace + "Identity")
                 ?.Attribute("Version")?.Value;
-            versions.Add(new Version(version));
+
+            try
+            {
+                versions.Add(new Version(version));
+            }
+            catch
+            {
+                // ignored
+            }
 
             return versions.Any() ? versions : null;
         }
@@ -38,7 +46,7 @@ namespace SemanticVersioning.Models
             XNamespace xNamespace = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
 
             xDocument.Element(xNamespace + "Package")?.Element(xNamespace + "Identity")
-                ?.SetAttributeValue("Version", version.ToAssemblyVersionString());
+                ?.SetAttributeValue("Version", version.ToAssemblyVersionString(false));
 
             var xmlWriterSettings = new XmlWriterSettings
             {

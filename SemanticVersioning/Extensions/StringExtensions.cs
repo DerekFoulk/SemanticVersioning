@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 // ReSharper disable UnusedMember.Global
 
@@ -38,6 +39,11 @@ namespace SemanticVersioning.Extensions
             var arr = s.Split(new[] {value}, StringSplitOptions.None);
 
             return arr.FirstOrDefault();
+        }
+
+        public static bool IsNumber(this string s)
+        {
+            return !string.IsNullOrWhiteSpace(s) && Regex.IsMatch(s, @"^\d+$");
         }
     }
 }
