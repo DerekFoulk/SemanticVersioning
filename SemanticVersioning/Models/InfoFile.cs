@@ -52,7 +52,7 @@ namespace SemanticVersioning.Models
 
             var dict = xDocument.Element("plist")?.Element("dict");
 
-            AddOrUpdate("CFBundleShortVersionString", version.ToString(), dict);
+            AddOrUpdate("CFBundleShortVersionString", version.ToVersionString(), dict);
 
             var bundleVersion = default(int);
             var bundleVersionNode = dict?.Descendants("key").FirstOrDefault(x => x.Value == "CFBundleVersion");

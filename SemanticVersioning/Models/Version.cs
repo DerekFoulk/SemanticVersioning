@@ -84,6 +84,29 @@ namespace SemanticVersioning.Models
             return version;
         }
 
+        public string ToVersionString()
+        {
+            var version = $"{Major}";
+
+            if (Minor != null)
+            {
+                version += $".{Minor}";
+
+                if (Patch != null)
+                {
+                    version += $".{Patch}";
+
+                    if (Build.IsNumber())
+                        version += $".{Build}";
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(Suffix))
+                version += $"-{Suffix}";
+
+            return version;
+        }
+
         public string ToAssemblyVersionString(bool allowWildcard = true)
         {
             var build = !string.IsNullOrWhiteSpace(Build) ? Build : "0";

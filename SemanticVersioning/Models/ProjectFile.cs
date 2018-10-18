@@ -52,7 +52,7 @@ namespace SemanticVersioning.Models
         {
             var xDocument = XDocument.Load(FileName);
 
-            xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("Version", version.ToString());
+            xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("Version", version.ToVersionString());
             xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("AssemblyVersion", null);
             xDocument.Element("Project")?.Element("PropertyGroup")?.SetElementValue("FileVersion", null);
 
