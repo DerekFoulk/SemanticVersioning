@@ -2,7 +2,7 @@
 {
     public static class RegexPatterns
     {
-        public static string VersionNumbers => @"\d+(\.\d+)*";
+        public static string VersionNumbers => @"\d+(\.\d+){0,2}(\.(\d|\*)+)?";
 
         public static string AssemblyInfoVersions => $@"Assembly(File)*Version\(""{VersionNumbers}""\)";
 

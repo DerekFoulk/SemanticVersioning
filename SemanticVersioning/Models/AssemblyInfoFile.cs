@@ -24,10 +24,17 @@ namespace SemanticVersioning.Models
             var versions = new List<Version>();
 
             var file = File.ReadAllText(FileName);
+
+            if (string.IsNullOrWhiteSpace(file))
+                return null;
+
             var matches = Regex.Matches(file, RegexPatterns.AssemblyInfoVersions);
 
             foreach (Match match in matches)
             {
+                if (string.IsNullOrWhiteSpace(match.Value))
+                    continue;
+
                 var version = Regex.Match(match.Value, RegexPatterns.VersionNumbers).Value;
                 versions.Add(new Version(version));
             }
